@@ -11,6 +11,7 @@ import java.util.List;
 public class Lox {
 
   static boolean hadError = false;
+
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
       System.out.println("Usage: jlox [script]");
@@ -24,8 +25,6 @@ public class Lox {
 
   /**
    * Starting jlox from the CLI : reads the file and executes it
-   * @param path
-   * @throws IOException
    */
   private static void runFile(String path) throws IOException {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
@@ -35,7 +34,6 @@ public class Lox {
 
   /**
    * Running the interpreter interactively : execute code one line at a time
-   * @throws IOException
    */
   private static void runPrompt() throws IOException {
     InputStreamReader input = new InputStreamReader(System.in);
@@ -52,7 +50,6 @@ public class Lox {
 
   /**
    * runFile() and runPrompt() are 'wrappers' around this core method
-   * @param source
    */
   private static void run(String source) {
     Scanner scanner = new Scanner(source);
@@ -65,8 +62,6 @@ public class Lox {
 
   /**
    * Tells the user, with the help of {@link #report(int, String, String)}, that some syntax error occurred.
-   * @param line
-   * @param message
    */
   static void error(int line, String message) {
     report(line, "", message);
