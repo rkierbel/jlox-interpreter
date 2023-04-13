@@ -3,15 +3,24 @@ package com.jlox.lox;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jlox.lox.TokenType.BANG;
+import static com.jlox.lox.TokenType.BANG_EQUAL;
 import static com.jlox.lox.TokenType.COMMA;
 import static com.jlox.lox.TokenType.DOT;
+import static com.jlox.lox.TokenType.EQUAL;
+import static com.jlox.lox.TokenType.EQUAL_EQUAL;
+import static com.jlox.lox.TokenType.GREATER;
+import static com.jlox.lox.TokenType.GREATER_EQUAL;
 import static com.jlox.lox.TokenType.LEFT_BRACE;
 import static com.jlox.lox.TokenType.LEFT_PAREN;
+import static com.jlox.lox.TokenType.LESS;
+import static com.jlox.lox.TokenType.LESS_EQUAL;
 import static com.jlox.lox.TokenType.MINUS;
 import static com.jlox.lox.TokenType.PLUS;
 import static com.jlox.lox.TokenType.RIGHT_BRACE;
 import static com.jlox.lox.TokenType.RIGHT_PAREN;
 import static com.jlox.lox.TokenType.SEMICOLON;
+import static com.jlox.lox.TokenType.SLASH;
 import static com.jlox.lox.TokenType.STAR;
 
 /**
@@ -56,6 +65,20 @@ public class Scanner {
       case '+' -> addToken(PLUS);
       case ';' -> addToken(SEMICOLON);
       case '*' -> addToken(STAR);
+      case '!' -> addToken(match('=') ? BANG_EQUAL : BANG);
+      case '=' -> addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+      case '<' -> addToken(match('=') ? LESS_EQUAL : LESS);
+      case '>' -> addToken(match('=') ? GREATER_EQUAL : GREATER);
+      case '/' -> {
+        if (match('/')) {
+          /* keep consuming comment's characters until end the line
+             addToken() not called because comments are not meaningful */
+          while (peek() != '\n' && !isAtEnd()) advance();
+        } else {
+          addToken(SLASH);
+        }
+      }
+      default -> Lox.error(line, "Unexpected character."); //erroneous character still consumed
     }
   }
 
@@ -79,5 +102,24 @@ public class Scanner {
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
     tokens.add(new Token(type, text, literal, line));
+  }
+
+  /**
+   * Works like a conditional advance() that consumes the character only if it is expected.
+   */
+  private boolean match(char expected) {
+    if (isAtEnd()) return false;
+    if (source.charAt(current) != expected) return false;
+
+    current++;
+    return true;
+  }
+
+  /**
+   * Lookahead : looks at the current unconsumed char.
+   */
+  private char peek() {
+    if (isAtEnd()) return '\0';
+    return source.charAt(current);
   }
 }
