@@ -22,6 +22,7 @@ import static com.jlox.lox.TokenType.RIGHT_PAREN;
 import static com.jlox.lox.TokenType.SEMICOLON;
 import static com.jlox.lox.TokenType.SLASH;
 import static com.jlox.lox.TokenType.STAR;
+import static com.jlox.lox.TokenType.STRING;
 
 /**
  * Stores the source code as a String from which it generates a list of tokens.
@@ -78,6 +79,10 @@ public class Scanner {
           addToken(SLASH);
         }
       }
+      //ignore whitespaces : starts a new lexeme after a whitespace char
+      case ' ', '\r', '\t' -> {}
+      case '\n' -> line++;
+      case'"' -> string();
       default -> Lox.error(line, "Unexpected character."); //erroneous character still consumed
     }
   }
@@ -121,5 +126,21 @@ public class Scanner {
   private char peek() {
     if (isAtEnd()) return '\0';
     return source.charAt(current);
+  }
+
+  private void string() {
+    while (peek() != '"' && !isAtEnd()) {
+      if (peek() == '\n') line++;
+      advance();
+    }
+
+    if (isAtEnd()) {
+      Lox.error(line, "Unterminated string.");
+      return;
+    }
+
+    advance(); //to closing double quote char
+    String value = source.substring(start+1, current-1); //strip surrounding quotes
+    addToken(STRING, value);
   }
 }
