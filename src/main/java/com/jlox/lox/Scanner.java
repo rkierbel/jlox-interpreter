@@ -158,7 +158,7 @@ public class Scanner {
   private void number() {
     while (isDigit(peek())) advance();
 
-    if (peek() == '.' && isDigit(peekNext())) { //check if there's a character after the decimal point
+    if (peek() == '.' && isDigit(peekNext())) { //check if there's a character after the decimal point.
       advance();
       while (isDigit(peek())) advance();
     }
