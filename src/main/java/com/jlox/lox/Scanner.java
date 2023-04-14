@@ -16,6 +16,7 @@ import static com.jlox.lox.TokenType.LEFT_PAREN;
 import static com.jlox.lox.TokenType.LESS;
 import static com.jlox.lox.TokenType.LESS_EQUAL;
 import static com.jlox.lox.TokenType.MINUS;
+import static com.jlox.lox.TokenType.NUMBER;
 import static com.jlox.lox.TokenType.PLUS;
 import static com.jlox.lox.TokenType.RIGHT_BRACE;
 import static com.jlox.lox.TokenType.RIGHT_PAREN;
@@ -83,7 +84,13 @@ public class Scanner {
       case ' ', '\r', '\t' -> {}
       case '\n' -> line++;
       case'"' -> string();
-      default -> Lox.error(line, "Unexpected character."); //erroneous character still consumed
+      default -> {
+        if (isDigit(c)) {
+          number();
+        } else {
+          Lox.error(line, "Unexpected character."); //erroneous character still consumed}
+        }
+      }
     }
   }
 
@@ -142,5 +149,25 @@ public class Scanner {
     advance(); //to closing double quote char
     String value = source.substring(start+1, current-1); //strip surrounding quotes
     addToken(STRING, value);
+  }
+
+  private boolean isDigit(char c) {
+    return c >= '0' && c <= '9';
+  }
+
+  private void number() {
+    while (isDigit(peek())) advance();
+
+    if (peek() == '.' && isDigit(peekNext())) { //check if there's a character after the decimal point
+      advance();
+      while (isDigit(peek())) advance();
+    }
+
+    addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+  }
+
+  private char peekNext() {
+    if (current+1 >= source.length()) return '\0';
+    return source.charAt(current+1);
   }
 }
