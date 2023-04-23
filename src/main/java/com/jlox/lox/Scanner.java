@@ -1,29 +1,11 @@
 package com.jlox.lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static com.jlox.lox.TokenType.BANG;
-import static com.jlox.lox.TokenType.BANG_EQUAL;
-import static com.jlox.lox.TokenType.COMMA;
-import static com.jlox.lox.TokenType.DOT;
-import static com.jlox.lox.TokenType.EQUAL;
-import static com.jlox.lox.TokenType.EQUAL_EQUAL;
-import static com.jlox.lox.TokenType.GREATER;
-import static com.jlox.lox.TokenType.GREATER_EQUAL;
-import static com.jlox.lox.TokenType.LEFT_BRACE;
-import static com.jlox.lox.TokenType.LEFT_PAREN;
-import static com.jlox.lox.TokenType.LESS;
-import static com.jlox.lox.TokenType.LESS_EQUAL;
-import static com.jlox.lox.TokenType.MINUS;
-import static com.jlox.lox.TokenType.NUMBER;
-import static com.jlox.lox.TokenType.PLUS;
-import static com.jlox.lox.TokenType.RIGHT_BRACE;
-import static com.jlox.lox.TokenType.RIGHT_PAREN;
-import static com.jlox.lox.TokenType.SEMICOLON;
-import static com.jlox.lox.TokenType.SLASH;
-import static com.jlox.lox.TokenType.STAR;
-import static com.jlox.lox.TokenType.STRING;
+import static com.jlox.lox.TokenType.*;
 
 /**
  * Stores the source code as a String from which it generates a list of tokens.
@@ -35,12 +17,34 @@ public class Scanner {
   private int current = 0; //char being considered currently
   private int line = 1; //tracks what source code's line the current lexeme stands on
 
+  private static final Map<String, TokenType> keywords;
+
+  static {
+    keywords = new HashMap<>();
+    keywords.put("and", AND);
+    keywords.put("class", CLASS);
+    keywords.put("else", ELSE);
+    keywords.put("false", FALSE);
+    keywords.put("for", FOR);
+    keywords.put("fun", FUN);
+    keywords.put("if", IF);
+    keywords.put("nil", NIL);
+    keywords.put("or", OR);
+    keywords.put("print", PRINT);
+    keywords.put("return", RETURN);
+    keywords.put("super", SUPER);
+    keywords.put("this", THIS);
+    keywords.put("true", TRUE);
+    keywords.put("var", VAR);
+    keywords.put("while", WHILE);
+  }
+
   Scanner(String src) {
     this.source = src;
   }
 
   List<Token> scanTokens() {
-    while(!isAtEnd()) {
+    while (!isAtEnd()) {
       //beginning of a lexeme
       start = current;
       scanToken();
@@ -72,21 +76,25 @@ public class Scanner {
       case '<' -> addToken(match('=') ? LESS_EQUAL : LESS);
       case '>' -> addToken(match('=') ? GREATER_EQUAL : GREATER);
       case '/' -> {
+        //keep consuming comment's characters : addToken() not called because comments are discarded
         if (match('/')) {
-          /* keep consuming comment's characters until end the line
-             addToken() not called because comments are not meaningful */
           while (peek() != '\n' && !isAtEnd()) advance();
+        } else if (match('*')) {
+          while (peek() != '*' && peekNext() != '/' && !isAtEnd()) advance();
         } else {
           addToken(SLASH);
         }
       }
       //ignore whitespaces : starts a new lexeme after a whitespace char
-      case ' ', '\r', '\t' -> {}
+      case ' ', '\r', '\t' -> {
+      }
       case '\n' -> line++;
-      case'"' -> string();
+      case '"' -> string();
       default -> {
         if (isDigit(c)) {
           number();
+        } else if (isAlpha(c)) { //handle identifiers and reserved words
+          identifier();
         } else {
           Lox.error(line, "Unexpected character."); //erroneous character still consumed}
         }
@@ -147,7 +155,7 @@ public class Scanner {
     }
 
     advance(); //to closing double quote char
-    String value = source.substring(start+1, current-1); //strip surrounding quotes
+    String value = source.substring(start + 1, current - 1); //strip surrounding quotes
     addToken(STRING, value);
   }
 
@@ -167,7 +175,26 @@ public class Scanner {
   }
 
   private char peekNext() {
-    if (current+1 >= source.length()) return '\0';
-    return source.charAt(current+1);
+    if (current + 1 >= source.length()) return '\0';
+    return source.charAt(current + 1);
+  }
+
+  private void identifier() {
+    while (isAlphanumeric(peek())) advance();
+
+    String text = source.substring(start, current);
+    TokenType type = keywords.get(text);
+    if (type == null) type = IDENTIFIER;
+    addToken(type);
+  }
+
+  private boolean isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            c == '_';
+  }
+
+  private boolean isAlphanumeric(char c) {
+    return isAlpha(c) || isDigit(c);
   }
 }
