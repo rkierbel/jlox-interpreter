@@ -1,7 +1,7 @@
 package com.jlox.lox;
 
 /**
- * Provides a comprehensive typology of what kind of token a lexeme can represent
+ * Provides a comprehensive typology of what kind of token a lexeme can represent.
  */
 enum TokenType {
   //single-character tokens

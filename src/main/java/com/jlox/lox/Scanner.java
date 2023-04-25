@@ -96,7 +96,7 @@ public class Scanner {
         } else if (isAlpha(c)) { //handle identifiers and reserved words
           identifier();
         } else {
-          Lox.error(line, "Unexpected character."); //erroneous character still consumed}
+          Lox.error(line, "Unexpected character."); //erroneous character still consumed
         }
       }
     }
@@ -110,7 +110,7 @@ public class Scanner {
   }
 
   /**
-   * Creates a token from the current lexeme.
+   * Creates a token from the current lexeme
    */
   private void addToken(TokenType type) {
     addToken(type, null);
@@ -166,7 +166,7 @@ public class Scanner {
   private void number() {
     while (isDigit(peek())) advance();
 
-    if (peek() == '.' && isDigit(peekNext())) { //check if there's a character after the decimal point.
+    if (peek() == '.' && isDigit(peekNext())) { //check if there's a character after the decimal point
       advance();
       while (isDigit(peek())) advance();
     }

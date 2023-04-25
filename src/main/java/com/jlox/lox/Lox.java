@@ -24,7 +24,7 @@ public class Lox {
   }
 
   /**
-   * Starting jlox from the CLI : reads the file and executes it
+   * Starting jlox from the CLI : reads the file and executes it.
    */
   private static void runFile(String path) throws IOException {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
@@ -33,7 +33,7 @@ public class Lox {
   }
 
   /**
-   * Running the interpreter interactively : execute code one line at a time
+   * Running the interpreter interactively : execute code one line at a time.
    */
   private static void runPrompt() throws IOException {
     InputStreamReader input = new InputStreamReader(System.in);
@@ -49,7 +49,7 @@ public class Lox {
   }
 
   /**
-   * runFile() and runPrompt() are 'wrappers' around this core method
+   * runFile() and runPrompt() are 'wrappers' around this core method.
    */
   private static void run(String source) {
     Scanner scanner = new Scanner(source);
