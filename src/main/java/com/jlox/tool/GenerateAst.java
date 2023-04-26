@@ -31,19 +31,37 @@ public class GenerateAst {
     String path = outputDir + "\\" + baseName + ".java";
 
     try (var writer = new PrintWriter(path, StandardCharsets.UTF_8)) {
-      writer.println("package com.jlox.lox");
+      writer.println("package com.jlox.lox;");
       writer.println();
       writer.println("import java.util.List;");
       writer.println();
       writer.println("abstract class " + baseName + " {");
+
+      defineVisitor(writer, baseName, types);
 
       for (String type : types) {
         String className = type.split(":")[0].trim();
         String fields = type.split(":")[1].trim();
         defineType(writer, baseName, className, fields);
       }
+
+      writer.println();
+      writer.println(twoSpaces + "abstract <R> R accept(Visitor<R> visitor);");
+
       writer.println("}");
     }
+  }
+
+  private static void defineVisitor(PrintWriter writer,
+                                    String baseName,
+                                    List<String> types) {
+    writer.println(twoSpaces + "interface Visitor<R> {");
+    for (String type : types) {
+      String typeName = type.split(":")[0].trim();
+      writer.println(fourSpaces + "R visit" + typeName + baseName + "(" +
+              typeName + " " + baseName.toLowerCase()  +");");
+    }
+    writer.println("}");
   }
 
   private static void defineType(PrintWriter writer,
@@ -60,6 +78,13 @@ public class GenerateAst {
       String name = field.split(" ")[1];
       writer.println(fourSpaces + twoSpaces + "this." + name + " = " + name + ";");
     }
+    writer.println(fourSpaces + "}");
+
+    writer.println();
+    writer.println(fourSpaces + "@Override");
+    writer.println(fourSpaces + "<R> R accept(Visitor<R> visitor) {");
+    writer.println(fourSpaces + "return visitor.visit" +
+            className + baseName + "(this);");
     writer.println(fourSpaces + "}");
 
     for (String field : fieldsArr) {
