@@ -2,26 +2,7 @@ package com.jlox.lox;
 
 import java.util.List;
 
-import static com.jlox.lox.TokenType.BANG;
-import static com.jlox.lox.TokenType.BANG_EQUAL;
-import static com.jlox.lox.TokenType.EOF;
-import static com.jlox.lox.TokenType.EQUAL_EQUAL;
-import static com.jlox.lox.TokenType.FALSE;
-import static com.jlox.lox.TokenType.GREATER;
-import static com.jlox.lox.TokenType.GREATER_EQUAL;
-import static com.jlox.lox.TokenType.LEFT_PAREN;
-import static com.jlox.lox.TokenType.LESS;
-import static com.jlox.lox.TokenType.LESS_EQUAL;
-import static com.jlox.lox.TokenType.MINUS;
-import static com.jlox.lox.TokenType.NIL;
-import static com.jlox.lox.TokenType.NUMBER;
-import static com.jlox.lox.TokenType.PLUS;
-import static com.jlox.lox.TokenType.RIGHT_PAREN;
-import static com.jlox.lox.TokenType.SEMICOLON;
-import static com.jlox.lox.TokenType.SLASH;
-import static com.jlox.lox.TokenType.STAR;
-import static com.jlox.lox.TokenType.STRING;
-import static com.jlox.lox.TokenType.TRUE;
+import static com.jlox.lox.TokenType.*;
 
 public class Parser {
 
