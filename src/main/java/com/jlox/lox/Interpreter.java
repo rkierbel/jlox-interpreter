@@ -1,5 +1,9 @@
 package com.jlox.lox;
 
+import java.util.List;
+
+import static com.jlox.lox.TokenType.*;
+
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
  */
@@ -10,6 +14,8 @@ public class Interpreter implements Expr.Visitor<Object> {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
 
+    if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, PLUS, SLASH, STAR).contains(expr.operator.type))
+      checkNumberOperands(expr.operator, right);
     return switch (expr.operator.type) {
       case GREATER -> (double) left > (double) right;
       case GREATER_EQUAL -> (double) left >= (double) right;
@@ -56,7 +62,10 @@ public class Interpreter implements Expr.Visitor<Object> {
     Object right = evaluate(expr.right);
 
     return switch (expr.operator.type) {
-      case MINUS -> -(double)right;
+      case MINUS -> {
+        checkNumberOperand(expr.operator, right);
+        yield -(double) right;
+      }
       case BANG -> !isTruthy(right);
       default -> null;
     };
@@ -79,5 +88,15 @@ public class Interpreter implements Expr.Visitor<Object> {
     if (obj == null) return false;
     if (obj instanceof Boolean b) return b;
     return true;
+  }
+
+  private void checkNumberOperands(Token operator, Object left, Object right) {
+    if (left instanceof Double && right instanceof Double) return;
+    throw new RuntimeError(operator, "Operands must be numbers.");
+  }
+
+  private void checkNumberOperand(Token operator, Object operand) {
+    if (operand instanceof Double) return;
+    throw new RuntimeError(operator, "Operand must be a number.");
   }
 }
