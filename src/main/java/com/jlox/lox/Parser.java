@@ -38,10 +38,8 @@ public class Parser {
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
       Token operator = previous();
       Expr right = comparison();
-      /*
-       * For each iteration, store resulting expression back in expr,
-       * creating a left-associative nested tree of binary operator nodes
-       */
+      /* For each iteration, store resulting expression back in expr,
+       creating a left-associative nested tree of binary operator node */
       expr = new Expr.Binary(expr, operator, right);
     }
     //If never entered the loop, returns comparison(), matching an equality operator or anything of higher precedence
