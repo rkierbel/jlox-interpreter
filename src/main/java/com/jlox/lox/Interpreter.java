@@ -14,8 +14,10 @@ public class Interpreter implements Expr.Visitor<Object> {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
 
-    if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, PLUS, SLASH, STAR).contains(expr.operator.type))
-      checkNumberOperands(expr.operator, right);
+    if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, PLUS, SLASH, STAR)
+            .contains(expr.operator.type))
+      checkNumberOperands(expr.operator, left, right);
+
     return switch (expr.operator.type) {
       case GREATER -> (double) left > (double) right;
       case GREATER_EQUAL -> (double) left >= (double) right;
