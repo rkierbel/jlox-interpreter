@@ -9,6 +9,15 @@ import static com.jlox.lox.TokenType.*;
  */
 public class Interpreter implements Expr.Visitor<Object> {
 
+  void interpret(Expr expr) {
+      try {
+        Object value = evaluate(expr);
+        System.out.println(stringify(value));
+      } catch (RuntimeError error) {
+        Lox.runtimeError(error);
+      }
+  }
+
   @Override
   public Object visitBinaryExpr(Expr.Binary expr)  {
     Object left = evaluate(expr.left);
@@ -71,6 +80,18 @@ public class Interpreter implements Expr.Visitor<Object> {
       case BANG -> !isTruthy(right);
       default -> null;
     };
+  }
+
+  private String stringify(Object obj) {
+    if (obj == null) return "nil";
+    if (obj instanceof Double d) {
+      String txt = obj.toString();
+      if (txt.endsWith(".O")) {
+        txt = txt.substring(0, txt.length() -2);
+      }
+      return txt;
+    }
+    return obj.toString();
   }
 
   /**
