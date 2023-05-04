@@ -14,7 +14,7 @@ public class Interpreter implements Expr.Visitor<Object> {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
 
-    if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, PLUS, SLASH, STAR)
+    if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, SLASH, STAR)
             .contains(expr.operator.type))
       checkNumberOperands(expr.operator, left, right);
 
@@ -31,7 +31,7 @@ public class Interpreter implements Expr.Visitor<Object> {
           yield l + r;
         if (left instanceof String l && right instanceof String r)
           yield l + r;
-        yield null;
+        throw new RuntimeError(expr.operator, "Operands must be two numbers or two Strings.");
       }
       case SLASH -> (double) left / (double) right;
       case STAR -> (double) left * (double) right;
