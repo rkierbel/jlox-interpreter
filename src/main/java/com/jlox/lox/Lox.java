@@ -10,6 +10,8 @@ import java.util.List;
 
 public class Lox {
 
+  //Successive calls to run() inside a REPL session will use the same interpreter
+  private static final Interpreter interpreter = new Interpreter();
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
 
@@ -61,7 +63,7 @@ public class Lox {
     Expr expr = parser.parse();
 
     if (hadError) return;
-    System.out.println(new AstPrinter().print(expr));
+    interpreter.interpret(expr);
   }
 
   /**

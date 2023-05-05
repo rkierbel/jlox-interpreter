@@ -2,30 +2,41 @@ package com.jlox.lox;
 
 import java.util.List;
 
-import static com.jlox.lox.TokenType.*;
+import static com.jlox.lox.TokenType.GREATER;
+import static com.jlox.lox.TokenType.GREATER_EQUAL;
+import static com.jlox.lox.TokenType.LESS;
+import static com.jlox.lox.TokenType.LESS_EQUAL;
+import static com.jlox.lox.TokenType.MINUS;
+import static com.jlox.lox.TokenType.SLASH;
+import static com.jlox.lox.TokenType.STAR;
 
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
  */
 public class Interpreter implements Expr.Visitor<Object> {
 
+  /**
+   * Takes in a syntax tree for an expression, and evaluates it.
+   *
+   * @param expr
+   */
   void interpret(Expr expr) {
-      try {
-        Object value = evaluate(expr);
-        System.out.println(stringify(value));
-      } catch (RuntimeError error) {
-        Lox.runtimeError(error);
-      }
+    try {
+      Object value = evaluate(expr); //returns an object for the result value
+      System.out.println(stringify(value)); //convert a Lox value to a string
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+    }
   }
 
   @Override
-  public Object visitBinaryExpr(Expr.Binary expr)  {
+  public Object visitBinaryExpr(Expr.Binary expr) {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
-
     if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, SLASH, STAR)
-            .contains(expr.operator.type))
+            .contains(expr.operator.type)) {
       checkNumberOperands(expr.operator, left, right);
+    }
 
     return switch (expr.operator.type) {
       case GREATER -> (double) left > (double) right;
@@ -38,11 +49,16 @@ public class Interpreter implements Expr.Visitor<Object> {
       case PLUS -> { //Operator is overloaded
         if (left instanceof Double l && right instanceof Double r)
           yield l + r;
-        if (left instanceof String l && right instanceof String r)
-          yield l + r;
+        if (left instanceof String l &&
+                (right instanceof Double || right instanceof String)) {
+          yield l + right;
+        }
         throw new RuntimeError(expr.operator, "Operands must be two numbers or two Strings.");
       }
-      case SLASH -> (double) left / (double) right;
+      case SLASH -> {
+        if ((double) right == 0) throw new RuntimeError(expr.operator, "Division by zero!");
+        else yield (double) left / (double) right;
+      }
       case STAR -> (double) left * (double) right;
       default -> null;
     };
@@ -84,10 +100,11 @@ public class Interpreter implements Expr.Visitor<Object> {
 
   private String stringify(Object obj) {
     if (obj == null) return "nil";
-    if (obj instanceof Double d) {
+    if (obj instanceof Double) {
       String txt = obj.toString();
       if (txt.endsWith(".O")) {
-        txt = txt.substring(0, txt.length() -2);
+        //Lox uses double-precision numbers only. For integer values, prints without decimal point
+        txt = txt.substring(0, txt.length() - 2);
       }
       return txt;
     }
