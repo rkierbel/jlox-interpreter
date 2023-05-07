@@ -3,7 +3,30 @@ package com.jlox.lox;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jlox.lox.TokenType.*;
+import static com.jlox.lox.TokenType.BANG;
+import static com.jlox.lox.TokenType.BANG_EQUAL;
+import static com.jlox.lox.TokenType.EOF;
+import static com.jlox.lox.TokenType.EQUAL;
+import static com.jlox.lox.TokenType.EQUAL_EQUAL;
+import static com.jlox.lox.TokenType.FALSE;
+import static com.jlox.lox.TokenType.GREATER;
+import static com.jlox.lox.TokenType.GREATER_EQUAL;
+import static com.jlox.lox.TokenType.IDENTIFIER;
+import static com.jlox.lox.TokenType.LEFT_PAREN;
+import static com.jlox.lox.TokenType.LESS;
+import static com.jlox.lox.TokenType.LESS_EQUAL;
+import static com.jlox.lox.TokenType.MINUS;
+import static com.jlox.lox.TokenType.NIL;
+import static com.jlox.lox.TokenType.NUMBER;
+import static com.jlox.lox.TokenType.PLUS;
+import static com.jlox.lox.TokenType.PRINT;
+import static com.jlox.lox.TokenType.RIGHT_PAREN;
+import static com.jlox.lox.TokenType.SEMICOLON;
+import static com.jlox.lox.TokenType.SLASH;
+import static com.jlox.lox.TokenType.STAR;
+import static com.jlox.lox.TokenType.STRING;
+import static com.jlox.lox.TokenType.TRUE;
+import static com.jlox.lox.TokenType.VAR;
 
 public class Parser {
 
@@ -28,13 +51,25 @@ public class Parser {
     List<Stmt> statements = new ArrayList<>();
 
     while (!isAtEnd())
-      statements.add(statement());
+      statements.add(declaration());
 
     return statements;
   }
 
+  private Stmt declaration() {
+    try {
+      if (match(VAR)) return varDeclaration();
+      return statement();
+    } catch (ParseError error) {
+      //Proceed to error recovery
+      synchronize();
+      return null;
+    }
+  }
+
   /**
    * A program is a list of statements, which are parsed by this method.
+   * Parses an expression statement if no other statement matches.
    */
   private Stmt statement() {
     if (match(PRINT)) return printStatement();
@@ -43,7 +78,7 @@ public class Parser {
   }
 
   private Stmt printStatement() {
-    Expr value =  expression();
+    Expr value = expression();
     consume(SEMICOLON, "Expect ';' after value.");
     return new Stmt.Print(value);
   }
@@ -57,8 +92,22 @@ public class Parser {
     return new Stmt.Expression(value);
   }
 
+  private Stmt varDeclaration() {
+    //Parser has a match for the 'var' token, will then require an identifier token (variable name)
+    Token name = consume(IDENTIFIER, "Expect variable name.");
+
+    Expr initializer = null;
+    if (match(EQUAL)) { //Parser then knows it's an initializer expression
+      initializer = expression();
+    }
+
+    consume(SEMICOLON, "Expect ';' after variable declaration.");
+    return new Stmt.Var(name, initializer);
+  }
+
   /**
    * Each method parsing a grammar rule produces a syntax tree for the rule, then returns it to the caller.
+   * Will report a syntax error if it can't parse an expression at the current token.
    */
   private Expr expression() {
     return equality();
@@ -130,6 +179,7 @@ public class Parser {
     if (match(FALSE)) return new Expr.Literal(false);
     if (match(TRUE)) return new Expr.Literal(true);
     if (match(NIL)) return new Expr.Literal(null);
+    if (match(IDENTIFIER)) return new Expr.Variable(previous()); //Parsing variable expression
 
     if (match(NUMBER, STRING)) {
       return new Expr.Literal(previous().literal);

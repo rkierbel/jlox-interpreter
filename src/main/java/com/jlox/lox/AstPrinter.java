@@ -30,6 +30,11 @@ public class AstPrinter implements Expr.Visitor<String> {
     return parenthesize(expr.operator.lexeme, expr.right);
   }
 
+  @Override
+  public String visitVariableExpr(Expr.Variable expr) {
+    return null;
+  }
+
   /**
    * It calls accept() on each subexpression and passes in itself.
    * This is the recursive step that lets us print an entire tree.

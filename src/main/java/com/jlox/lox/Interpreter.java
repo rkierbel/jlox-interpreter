@@ -45,6 +45,11 @@ public class Interpreter implements Expr.Visitor<Object>,
   }
 
   @Override
+  public Void visitVarStmt(Stmt.Var stmt) {
+    return null;
+  }
+
+  @Override
   public Object visitBinaryExpr(Expr.Binary expr) {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
@@ -111,6 +116,11 @@ public class Interpreter implements Expr.Visitor<Object>,
       case BANG -> !isTruthy(right);
       default -> null;
     };
+  }
+
+  @Override
+  public Object visitVariableExpr(Expr.Variable expr) {
+    return null;
   }
 
   private String stringify(Object obj) {
