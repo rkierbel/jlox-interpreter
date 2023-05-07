@@ -1,5 +1,6 @@
 package com.jlox.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jlox.lox.TokenType.*;
@@ -15,12 +16,45 @@ public class Parser {
     this.tokens = tokens;
   }
 
-  Expr parse() {
+/*  Expr parse() {
     try {
       return expression();
     } catch (ParseError parsErr) {
       return null;
     }
+  }*/
+
+  List<Stmt> parse() {
+    List<Stmt> statements = new ArrayList<>();
+
+    while (!isAtEnd())
+      statements.add(statement());
+
+    return statements;
+  }
+
+  /**
+   * A program is a list of statements, which are parsed by this method.
+   */
+  private Stmt statement() {
+    if (match(PRINT)) return printStatement();
+
+    return expressionStatement();
+  }
+
+  private Stmt printStatement() {
+    Expr value =  expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new Stmt.Print(value);
+  }
+
+  /**
+   * The expression is wrapped in the corresponding statement before being returned as such.
+   */
+  private Stmt expressionStatement() {
+    Expr value = expression();
+    consume(SEMICOLON, "Expect ';' after expression.");
+    return new Stmt.Expression(value);
   }
 
   /**

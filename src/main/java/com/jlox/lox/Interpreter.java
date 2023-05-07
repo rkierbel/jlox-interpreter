@@ -2,31 +2,46 @@ package com.jlox.lox;
 
 import java.util.List;
 
-import static com.jlox.lox.TokenType.GREATER;
-import static com.jlox.lox.TokenType.GREATER_EQUAL;
-import static com.jlox.lox.TokenType.LESS;
-import static com.jlox.lox.TokenType.LESS_EQUAL;
-import static com.jlox.lox.TokenType.MINUS;
-import static com.jlox.lox.TokenType.SLASH;
-import static com.jlox.lox.TokenType.STAR;
+import static com.jlox.lox.TokenType.*;
 
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
  */
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>,
+                                    Stmt.Visitor<Void> {
 
   /**
    * Takes in a syntax tree for an expression, and evaluates it.
    *
-   * @param expr
+   * @param  statements -> program is a list of statements.
    */
-  void interpret(Expr expr) {
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expr); //returns an object for the result value
-      System.out.println(stringify(value)); //convert a Lox value to a string
+      for (Stmt stmt : statements) execute(stmt);
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
+  }
+
+  private void execute(Stmt statement) {
+    statement.accept(this);
+  }
+
+  /**
+   *
+   * @return Void because statements do not produce value.
+   */
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+    return null;
   }
 
   @Override
