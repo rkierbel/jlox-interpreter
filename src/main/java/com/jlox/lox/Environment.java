@@ -29,4 +29,13 @@ public class Environment {
   void define(String name, Object value) {
     values.put(name, value);
   }
+
+  /**
+   * Assignment cannot create a new variable.
+   */
+  public void assign(Token name, Object value) {
+    Object replaced = values.computeIfPresent(name.lexeme, (k, v) -> value);
+    if (replaced == null)
+      throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+  }
 }

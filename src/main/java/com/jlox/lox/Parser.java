@@ -110,7 +110,31 @@ public class Parser {
    * Will report a syntax error if it can't parse an expression at the current token.
    */
   private Expr expression() {
-    return equality();
+    return assignment();
+  }
+
+  /**
+   * The receiver (lvalue) of an assignment can be any expression (unbounded number of tokens).
+   *
+   */
+  private Expr assignment() {
+    Expr expr = equality();
+
+    //Parse the right hand side only if finds an '='
+    if (match(EQUAL)) {
+      Token equals = previous();
+      //Assignment being right associative, call is recursive to parse the right hand side
+      Expr value = assignment();
+
+      if (expr instanceof Expr.Variable variable) {
+        Token name = variable.name;
+        return new Expr.Assign(name, value);
+      }
+      //Error example -> a + b = c; (a) = 3;
+      error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
   }
 
   private Expr equality() {

@@ -11,6 +11,8 @@ abstract class Expr {
     R visitUnaryExpr(Unary expr);
 
     R visitVariableExpr(Variable expr);
+
+    R visitAssignExpr(Assign expr);
   }
 
   static class Binary extends Expr {
@@ -80,8 +82,28 @@ abstract class Expr {
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitVariableExpr(this);
     }
+
     final Token name;
   }
+
+  /**
+   * Left hand side of the assignment expression is a Token, that is a lvalue that evaluates to a storage location.
+   */
+  static class Assign extends Expr {
+    Assign(Token name, Expr value) {
+      this.name = name;
+      this.value = value;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitAssignExpr(this);
+    }
+
+    final Token name;
+    final Expr value;
+  }
+
 
   abstract <R> R accept(Visitor<R> visitor);
 }
