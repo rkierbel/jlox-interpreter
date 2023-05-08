@@ -10,6 +10,7 @@ import static com.jlox.lox.TokenType.*;
 public class Interpreter implements Expr.Visitor<Object>,
                                     Stmt.Visitor<Void> {
 
+  private Environment environment = new Environment();
   /**
    * Takes in a syntax tree for an expression, and evaluates it.
    *
@@ -46,6 +47,12 @@ public class Interpreter implements Expr.Visitor<Object>,
 
   @Override
   public Void visitVarStmt(Stmt.Var stmt) {
+    Object value = null;
+    if (stmt.initializer != null) {
+      value = evaluate(stmt.initializer);
+    }
+    //In the absence of an initializer, the value is set to 'nil' in Lox -> null in Java
+    environment.define(stmt.name.lexeme, value);
     return null;
   }
 
@@ -120,7 +127,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
-    return null;
+    return environment.get(expr.name);
   }
 
   private String stringify(Object obj) {
