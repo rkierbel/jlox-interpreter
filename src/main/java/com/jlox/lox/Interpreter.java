@@ -98,7 +98,7 @@ public class Interpreter implements Expr.Visitor<Object>,
                 (right instanceof Double || right instanceof String)) {
           yield l + right;
         }
-        throw new RuntimeError(expr.operator, "Operands must be two numbers or two Strings.");
+        throw new RuntimeError(expr.operator, "Operands must be two numbers or left operand must be a String.");
       }
       case SLASH -> {
         if ((double) right == 0) throw new RuntimeError(expr.operator, "Division by zero!");
