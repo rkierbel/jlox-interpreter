@@ -134,7 +134,7 @@ public class Parser {
   private Expr assignment() {
     Expr expr = equality();
 
-    //Parse the right hand side only if finds an '='
+    //Parse the right hand side only if it finds an '='
     if (match(EQUAL)) {
       Token equals = previous();
       //Assignment being right associative, call is recursive to parse the right hand side

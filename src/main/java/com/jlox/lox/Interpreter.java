@@ -52,7 +52,7 @@ public class Interpreter implements Expr.Visitor<Object>,
    */
   @Override
   public Void visitExpressionStmt(Stmt.Expression stmt) {
-    evaluate(stmt.expression);
+    System.out.println(stringify(evaluate(stmt.expression)));
     return null;
   }
 
