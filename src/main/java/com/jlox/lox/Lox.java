@@ -15,9 +15,8 @@ public class Lox {
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String ...args) throws IOException {
     if (args.length > 1) {
-      System.out.println("Usage: jlox [script]");
       System.exit(64); // exit codes the use conventions defined in the UNIX “sysexits.h” header
     } else if (args.length == 1) {
       runFile(args[0]);

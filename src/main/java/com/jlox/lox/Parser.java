@@ -12,6 +12,7 @@ import static com.jlox.lox.TokenType.FALSE;
 import static com.jlox.lox.TokenType.GREATER;
 import static com.jlox.lox.TokenType.GREATER_EQUAL;
 import static com.jlox.lox.TokenType.IDENTIFIER;
+import static com.jlox.lox.TokenType.LEFT_BRACE;
 import static com.jlox.lox.TokenType.LEFT_PAREN;
 import static com.jlox.lox.TokenType.LESS;
 import static com.jlox.lox.TokenType.LESS_EQUAL;
@@ -20,6 +21,7 @@ import static com.jlox.lox.TokenType.NIL;
 import static com.jlox.lox.TokenType.NUMBER;
 import static com.jlox.lox.TokenType.PLUS;
 import static com.jlox.lox.TokenType.PRINT;
+import static com.jlox.lox.TokenType.RIGHT_BRACE;
 import static com.jlox.lox.TokenType.RIGHT_PAREN;
 import static com.jlox.lox.TokenType.SEMICOLON;
 import static com.jlox.lox.TokenType.SLASH;
@@ -73,6 +75,7 @@ public class Parser {
    */
   private Stmt statement() {
     if (match(PRINT)) return printStatement();
+    if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
     return expressionStatement();
   }
@@ -81,6 +84,17 @@ public class Parser {
     Expr value = expression();
     consume(SEMICOLON, "Expect ';' after value.");
     return new Stmt.Print(value);
+  }
+
+  private List<Stmt> block() {
+    List<Stmt> statements = new ArrayList<>();
+
+    //Check for isAtEnd is necessary if user forgets closing right brace
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+      statements.add(declaration());
+    }
+    consume(RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
   }
 
   /**
