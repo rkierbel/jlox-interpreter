@@ -81,7 +81,7 @@ public class Parser {
     consume(SEMICOLON, "Expect ';' after loop condition.");
 
     Expr increment = null;
-    if (!check(SEMICOLON)) {
+    if (!check(RIGHT_PAREN)) {
       increment = expression();
     }
     consume(RIGHT_PAREN, "Expect ')' after 'for' clauses.");

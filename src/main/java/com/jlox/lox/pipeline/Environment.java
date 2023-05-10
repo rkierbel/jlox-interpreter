@@ -41,7 +41,7 @@ public class Environment {
     }
     if (enclosing != null) return enclosing.get(name);
     //It's ok to refer to a variable before it is defined only if the statement doesn't cause the variable to be evaluated
-    throw new RuntimeError(name, "Undefined variable '" + name + "'.");
+    throw new RuntimeError(name, "Undefined variable while getting '" + name + "'.");
   }
 
   /**
@@ -66,7 +66,7 @@ public class Environment {
       return;
     }
 
-    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    throw new RuntimeError(name, "Undefined variable while assigning '" + name.lexeme + "'.");
   }
 
 }
