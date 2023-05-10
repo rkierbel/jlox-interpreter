@@ -18,6 +18,9 @@ public abstract class Stmt {
     R visitIfStmt(If stmt);
 
     R visitWhileStmt(While stmt);
+
+    R visitBreakStmt(Break stmt);
+    R visitContinueStmt(Continue stmt);
   }
 
   public static class Block extends Stmt {
@@ -101,8 +104,32 @@ public abstract class Stmt {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitWhileStmt(this);
     }
+
     public final Expr condition;
     public final Stmt body;
+  }
+
+  public static class Break extends Stmt {
+    public Break() {
+
+    }
+
+    @Override
+   public  <R> R accept(final Visitor<R> visitor) {
+      return visitor.visitBreakStmt(this);
+    }
+
+  }
+
+  public static class Continue extends Stmt {
+    public Continue() {
+    }
+
+    @Override
+    public <R> R accept(final Visitor<R> visitor) {
+      return visitor.visitContinueStmt(this);
+    }
+
   }
 
 

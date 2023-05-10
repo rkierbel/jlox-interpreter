@@ -51,8 +51,10 @@ public class Parser {
   private Stmt statement() {
     if (match(FOR)) return forStatement();
     if (match(IF)) return ifStatement();
-    if (match(PRINT)) return printStatement();
     if (match(WHILE)) return whileStatement();
+    if (match(BREAK)) return breakStatement();
+    if (match(CONTINUE)) return continueStatement();
+    if (match(PRINT)) return printStatement();
     if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
     return expressionStatement();
@@ -70,8 +72,10 @@ public class Parser {
       initializer = expressionStatement(); //If neither the above keywords match, initializer must be an expression
     }
 
-    Expr condition = null;
-    if (!check(SEMICOLON)) {
+    Expr condition;
+    if (check(SEMICOLON)) {
+      condition = new Expr.Literal(true);
+    } else {
       condition = expression();
     }
     consume(SEMICOLON, "Expect ';' after loop condition.");
@@ -88,9 +92,7 @@ public class Parser {
     if (increment != null) {
       body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
     }
-    //Build the loop using primitive while
-    if (condition == null) condition = new Expr.Literal(true);
-    body = new Stmt.While(condition, body);
+    body = new Stmt.While(condition, body); //Build the loop using primitive while
     //If there's an initializer, runs once before the entire loop
     if (initializer != null) body = new Stmt.Block(Arrays.asList(initializer, body));
     return body;
@@ -109,13 +111,6 @@ public class Parser {
 
     return new Stmt.If(condition, thenBranch, elseBranch);
   }
-
-  private Stmt printStatement() {
-    Expr value = expression();
-    consume(SEMICOLON, "Expect ';' after value.");
-    return new Stmt.Print(value);
-  }
-
   private Stmt whileStatement() {
     consume(LEFT_PAREN, "Expect '(' after 'if'.");
     Expr condition = expression();
@@ -124,6 +119,25 @@ public class Parser {
 
     return new Stmt.While(condition, body);
   }
+
+  private Stmt breakStatement() {
+    consume(SEMICOLON, "Expected ';' after break.");
+
+    return new Stmt.Break();
+  }
+
+  private Stmt continueStatement() {
+    consume(SEMICOLON, "Expected ';' after continue.");
+
+    return new Stmt.Continue();
+  }
+
+  private Stmt printStatement() {
+    Expr value = expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new Stmt.Print(value);
+  }
+
 
   private List<Stmt> block() {
     List<Stmt> statements = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.jlox.lox.pipeline;
 
 import com.jlox.lox.Lox;
+import com.jlox.lox.exception.Jump;
 import com.jlox.lox.exception.RuntimeError;
 import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
@@ -8,19 +9,27 @@ import com.jlox.lox.grammar.token.Token;
 
 import java.util.List;
 
-import static com.jlox.lox.grammar.token.TokenType.*;
+import static com.jlox.lox.grammar.token.TokenType.GREATER;
+import static com.jlox.lox.grammar.token.TokenType.GREATER_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.LESS;
+import static com.jlox.lox.grammar.token.TokenType.LESS_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.MINUS;
+import static com.jlox.lox.grammar.token.TokenType.OR;
+import static com.jlox.lox.grammar.token.TokenType.SLASH;
+import static com.jlox.lox.grammar.token.TokenType.STAR;
 
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
  */
 public class Interpreter implements Expr.Visitor<Object>,
-                                    Stmt.Visitor<Void> {
+        Stmt.Visitor<Void> {
 
   private Environment environment = new Environment();
+
   /**
    * Takes in a syntax tree for an expression, and evaluates it.
    *
-   * @param  statements -> program is a list of statements.
+   * @param statements -> program is a list of statements.
    */
   public void interpret(List<Stmt> statements) {
     try {
@@ -53,7 +62,6 @@ public class Interpreter implements Expr.Visitor<Object>,
   }
 
   /**
-   *
    * @return Void because statements do not produce value.
    */
   @Override
@@ -194,9 +202,25 @@ public class Interpreter implements Expr.Visitor<Object>,
   @Override
   public Void visitWhileStmt(Stmt.While stmt) {
     while (isTruthy(evaluate(stmt.condition))) {
-      execute(stmt.body);
+      try {
+        execute(stmt.body);
+      } catch (Jump.Break b) {
+        break;
+      } catch (Jump.Continue c) {
+        continue;
+      }
     }
     return null;
+  }
+
+  @Override
+  public Void visitBreakStmt(Stmt.Break stmt) {
+    throw new Jump.Break();
+  }
+
+  @Override
+  public Void visitContinueStmt(Stmt.Continue stmt) {
+    throw new Jump.Continue();
   }
 
   private String stringify(Object obj) {

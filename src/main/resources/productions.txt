@@ -1,0 +1,51 @@
+program        → declaration* EOF ;
+declaration    → classDecl
+                | functionDecl
+                | variableDecl
+                | statement ;
+classDecl      → "class" IDENTIFIER ( "<" IDENTIFIER )? {" methodDecl* "}" ;
+methodDecl     → IDENTIFIER "(" parameters? ")" block
+                | "static" IDENTIFIER "(" parameters? ")" block
+                | IDENTIFIER block
+                | "static" block ;
+functionDecl   → "fun" function ;
+function       → IDENTIFIER "(" parameters? ")" block ;
+parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+variableDecl   → "var" IDENTIFIER ( "=" expression )? ";" ;
+statement      → continueStmt
+                | breakStmt
+                | returnStmt
+                | exprStmt
+                | ifStmt
+                | whileStmt
+                | forStmt
+                | block ;
+continueStmt   → "continue" ";" ;
+breakStmt      → "break" ";" ;
+returnStmt     → "return" expression? ";" ;
+forStmt        → "for" "(" ( variableDecl | exprStmt | ";")
+                            expression? ";"
+                            expression? ")" statement ;
+whileStmt      → "while" "(" expression ")" statement ;
+ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
+block          → "{" declaration* "}" ;
+exprStmt       → expression ";" ;
+expression     → assignment ( "," assignment )* ;
+assignment     → ( call "." )? IDENTIFIER "=" assignment
+                | ternary ;
+ternary        → logic_or ("?" expression ":" ternary)?  ;
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
+equality       → comparison? ( ( "!=" | "==" ) comparison )* ;
+comparison     → addition? ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+sum            → product? ( ( "-" | "+" ) product )* ;
+product        → unary? ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+                | call ;
+call           → primary ( "(" arguments? ")"  | "." IDENTIFIER )* ;
+arguments      → expression ( "," expression )* ;
+primary        → NUMBER | STRING
+                | "false" | "true" | "nil"
+                | "(" _expression_ ")"
+                | IDENTIFIER
+                | "super" "." IDENTIFIER ;
