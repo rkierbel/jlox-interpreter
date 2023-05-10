@@ -56,10 +56,17 @@ public class Environment {
    * Walks up the Environment parent-pointer tree.
    */
   public void assign(Token name, Object value) {
-    Object replaced = values.computeIfPresent(name.lexeme, (k, v) -> value);
-    if (replaced == null) {
-      if (enclosing != null) enclosing.assign(name, value);
-      throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    if (values.containsKey(name.lexeme)) {
+      values.put(name.lexeme, value);
+      return;
     }
+
+    if (enclosing != null) {
+      enclosing.assign(name, value);
+      return;
+    }
+
+    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
   }
+
 }

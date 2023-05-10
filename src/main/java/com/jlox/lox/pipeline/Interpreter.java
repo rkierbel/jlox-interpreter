@@ -58,7 +58,7 @@ public class Interpreter implements Expr.Visitor<Object>,
    */
   @Override
   public Void visitExpressionStmt(Stmt.Expression stmt) {
-    System.out.println(stringify(evaluate(stmt.expression)));
+    evaluate(stmt.expression);
     return null;
   }
 
@@ -189,6 +189,14 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
     //Evaluates right only if it cannot short-circuit
     return evaluate(expr.right);
+  }
+
+  @Override
+  public Void visitWhileStmt(Stmt.While stmt) {
+    while (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.body);
+    }
+    return null;
   }
 
   private String stringify(Object obj) {

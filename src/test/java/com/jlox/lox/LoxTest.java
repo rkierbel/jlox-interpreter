@@ -9,7 +9,12 @@ import java.io.IOException;
 class LoxTest {
 
   @Test
-  void test_RunFromFile() throws IOException {
-    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testScriptOne.txt");
+  void testScoping_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testScriptScopes.txt");
+  }
+
+  @Test
+  void testForLoop_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testScriptForLoop.txt");
   }
 }
