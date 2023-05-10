@@ -42,6 +42,11 @@ public class AstPrinter implements Expr.Visitor<String> {
     return null;
   }
 
+  @Override
+  public String visitLogicalExpr(Expr.Logical expr) {
+    return null;
+  }
+
   /**
    * It calls accept() on each subexpression and passes in itself.
    * This is the recursive step that lets us print an entire tree.

@@ -73,7 +73,7 @@ public abstract class Stmt {
   }
 
   public static class If extends Stmt {
-    If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
+    public If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
       this.condition = condition;
       this.thenBranch = thenBranch;
       this.elseBranch = elseBranch;
@@ -84,9 +84,9 @@ public abstract class Stmt {
       return visitor.visitIfStmt(this);
     }
 
-    final Expr condition;
-    final Stmt thenBranch;
-    final Stmt elseBranch;
+    public final Expr condition;
+    public final Stmt thenBranch;
+    public final Stmt elseBranch;
   }
 
 

@@ -164,7 +164,31 @@ public class Interpreter implements Expr.Visitor<Object>,
 
   @Override
   public Void visitIfStmt(Stmt.If stmt) {
+    if (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.thenBranch);
+    } else if (stmt.elseBranch != null) {
+      execute(stmt.elseBranch);
+    }
     return null;
+  }
+
+
+  /**
+   * Since Lox is dynamically typed and allows for any operand to represent truthiness.
+   * As such, a logic operator will return a value with appropriate truthiness : the operands themselves.
+   */
+  @Override
+  public Object visitLogicalExpr(Expr.Logical expr) {
+    //Evaluates the left operand first to see if we can short-circuit
+    Object left = evaluate(expr.left);
+
+    if (expr.operator.type == OR) {
+      if (isTruthy(left)) return left;
+    } else {
+      if (!isTruthy(left)) return left;
+    }
+    //Evaluates right only if it cannot short-circuit
+    return evaluate(expr.right);
   }
 
   private String stringify(Object obj) {
