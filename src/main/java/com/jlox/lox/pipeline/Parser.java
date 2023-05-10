@@ -1,34 +1,16 @@
-package com.jlox.lox;
+package com.jlox.lox.pipeline;
+
+import com.jlox.lox.Lox;
+import com.jlox.lox.exception.ParseError;
+import com.jlox.lox.grammar.string.Expr;
+import com.jlox.lox.grammar.string.Stmt;
+import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.grammar.token.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jlox.lox.TokenType.BANG;
-import static com.jlox.lox.TokenType.BANG_EQUAL;
-import static com.jlox.lox.TokenType.EOF;
-import static com.jlox.lox.TokenType.EQUAL;
-import static com.jlox.lox.TokenType.EQUAL_EQUAL;
-import static com.jlox.lox.TokenType.FALSE;
-import static com.jlox.lox.TokenType.GREATER;
-import static com.jlox.lox.TokenType.GREATER_EQUAL;
-import static com.jlox.lox.TokenType.IDENTIFIER;
-import static com.jlox.lox.TokenType.LEFT_BRACE;
-import static com.jlox.lox.TokenType.LEFT_PAREN;
-import static com.jlox.lox.TokenType.LESS;
-import static com.jlox.lox.TokenType.LESS_EQUAL;
-import static com.jlox.lox.TokenType.MINUS;
-import static com.jlox.lox.TokenType.NIL;
-import static com.jlox.lox.TokenType.NUMBER;
-import static com.jlox.lox.TokenType.PLUS;
-import static com.jlox.lox.TokenType.PRINT;
-import static com.jlox.lox.TokenType.RIGHT_BRACE;
-import static com.jlox.lox.TokenType.RIGHT_PAREN;
-import static com.jlox.lox.TokenType.SEMICOLON;
-import static com.jlox.lox.TokenType.SLASH;
-import static com.jlox.lox.TokenType.STAR;
-import static com.jlox.lox.TokenType.STRING;
-import static com.jlox.lox.TokenType.TRUE;
-import static com.jlox.lox.TokenType.VAR;
+import static com.jlox.lox.grammar.token.TokenType.*;
 
 public class Parser {
 
@@ -49,7 +31,7 @@ public class Parser {
     }
   }*/
 
-  List<Stmt> parse() {
+  public List<Stmt> parse() {
     List<Stmt> statements = new ArrayList<>();
 
     while (!isAtEnd())

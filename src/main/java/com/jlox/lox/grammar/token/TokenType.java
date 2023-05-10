@@ -1,9 +1,9 @@
-package com.jlox.lox;
+package com.jlox.lox.grammar.token;
 
 /**
  * Provides a comprehensive typology of what kind of token a lexeme can represent.
  */
-enum TokenType {
+public enum TokenType {
   //single-character tokens
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
   COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,

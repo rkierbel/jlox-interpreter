@@ -1,8 +1,14 @@
-package com.jlox.lox;
+package com.jlox.lox.pipeline;
+
+import com.jlox.lox.Lox;
+import com.jlox.lox.exception.RuntimeError;
+import com.jlox.lox.grammar.string.Expr;
+import com.jlox.lox.grammar.string.Stmt;
+import com.jlox.lox.grammar.token.Token;
 
 import java.util.List;
 
-import static com.jlox.lox.TokenType.*;
+import static com.jlox.lox.grammar.token.TokenType.*;
 
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
@@ -16,7 +22,7 @@ public class Interpreter implements Expr.Visitor<Object>,
    *
    * @param  statements -> program is a list of statements.
    */
-  void interpret(List<Stmt> statements) {
+  public void interpret(List<Stmt> statements) {
     try {
       for (Stmt stmt : statements) execute(stmt);
     } catch (RuntimeError error) {
@@ -154,6 +160,11 @@ public class Interpreter implements Expr.Visitor<Object>,
     environment.assign(expr.name, value);
 
     return value;
+  }
+
+  @Override
+  public Void visitIfStmt(Stmt.If stmt) {
+    return null;
   }
 
   private String stringify(Object obj) {

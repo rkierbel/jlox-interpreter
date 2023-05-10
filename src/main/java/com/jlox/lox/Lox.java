@@ -1,5 +1,13 @@
 package com.jlox.lox;
 
+import com.jlox.lox.exception.RuntimeError;
+import com.jlox.lox.grammar.string.Stmt;
+import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.grammar.token.TokenType;
+import com.jlox.lox.pipeline.Interpreter;
+import com.jlox.lox.pipeline.Parser;
+import com.jlox.lox.pipeline.Scanner;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -68,11 +76,11 @@ public class Lox {
   /**
    * Tells the user, with the help of {@link #report(int, String, String)}, that some syntax error occurred.
    */
-  static void error(int line, String message) {
+  public static void error(int line, String message) {
     report(line, "", message);
   }
 
-  static void error(Token token, String message) {
+  public static void error(Token token, String message) {
     if (token.type == TokenType.EOF) {
       report(token.line, " at end", message);
     } else {
@@ -87,7 +95,7 @@ public class Lox {
     hadError = true;
   }
 
-  static void runtimeError(RuntimeError error) {
+  public static void runtimeError(RuntimeError error) {
     System.err.println(error.getMessage() +
             "\n[line " + error.token.line + "]");
     hadRuntimeError = true;

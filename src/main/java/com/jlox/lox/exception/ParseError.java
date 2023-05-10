@@ -1,4 +1,4 @@
-package com.jlox.lox;
+package com.jlox.lox.exception;
 
 public class ParseError extends RuntimeException {
 }

@@ -1,11 +1,15 @@
-package com.jlox.lox;
+package com.jlox.lox.pipeline;
+
+import com.jlox.lox.Lox;
+import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.grammar.token.TokenType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jlox.lox.TokenType.*;
+import static com.jlox.lox.grammar.token.TokenType.*;
 
 /**
  * Stores the source code as a String from which it generates a list of tokens.
@@ -39,11 +43,11 @@ public class Scanner {
     keywords.put("while", WHILE);
   }
 
-  Scanner(String src) {
+  public Scanner(String src) {
     this.source = src;
   }
 
-  List<Token> scanTokens() {
+  public List<Token> scanTokens() {
     while (!isAtEnd()) {
       //beginning of a lexeme
       start = current;

@@ -1,8 +1,10 @@
-package com.jlox.lox;
+package com.jlox.lox.pipeline;
+
+import com.jlox.lox.grammar.string.Expr;
 
 public class AstPrinter implements Expr.Visitor<String> {
 
-  String print(Expr expr) {
+  public String print(Expr expr) {
     return expr.accept(this);
   }
 

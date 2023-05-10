@@ -1,4 +1,7 @@
-package com.jlox.lox;
+package com.jlox.lox.pipeline;
+
+import com.jlox.lox.exception.RuntimeError;
+import com.jlox.lox.grammar.token.Token;
 
 import java.util.HashMap;
 import java.util.Map;

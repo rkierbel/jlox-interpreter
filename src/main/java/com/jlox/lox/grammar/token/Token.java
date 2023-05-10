@@ -1,4 +1,4 @@
-package com.jlox.lox;
+package com.jlox.lox.grammar.token;
 
 /**
  * Accurate lexical analysis involves bundling the lexeme with specific data.
@@ -8,10 +8,10 @@ package com.jlox.lox;
  * For the purpose of tracking and reporting syntax errors, the location of the token must be remembered.
  */
 public class Token {
-  final TokenType type;
-  final String lexeme;
-  final Object literal;
-  final int line;
+  public final TokenType type;
+  public final String lexeme;
+  public final Object literal;
+  public final int line;
 
   public Token(TokenType type,
                String lexeme,
