@@ -17,4 +17,9 @@ class LoxTest {
   void testForLoop_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testScriptForLoop.txt");
   }
+
+  @Test
+  void testBreakContinue_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testBreakContinue.txt");
+  }
 }

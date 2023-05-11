@@ -19,10 +19,13 @@ public class Parser {
   private final List<Token> tokens;
   //Points to next token to be parsed
   private int current = 0;
+  private boolean allowExpr;
+  private boolean exprFound = false;
 
   public Parser(List<Token> tokens) {
     this.tokens = tokens;
   }
+
 
   public List<Stmt> parse() {
     List<Stmt> statements = new ArrayList<>();
@@ -31,6 +34,21 @@ public class Parser {
       statements.add(declaration());
 
     return statements;
+  }
+
+  public Object parseREPL() {
+    allowExpr = true;
+    List<Stmt> stmts = new ArrayList<>();
+
+    while (!isAtEnd()) {
+      stmts.add(declaration());
+      if (exprFound) {
+        Stmt last = stmts.get(stmts.size() - 1);
+        return ((Stmt.Expression) last).expression;
+      }
+      allowExpr = false;
+    }
+    return stmts;
   }
 
   private Stmt declaration() {
@@ -155,7 +173,11 @@ public class Parser {
    */
   private Stmt expressionStatement() {
     Expr value = expression();
-    consume(SEMICOLON, "Expect ';' after expression.");
+    if (allowExpr && isAtEnd()) {
+      exprFound = true;
+    } else {
+      consume(SEMICOLON, "Expect ';' after expression.");
+    }
     return new Stmt.Expression(value);
   }
 

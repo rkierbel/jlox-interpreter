@@ -1,6 +1,7 @@
 package com.jlox.lox;
 
 import com.jlox.lox.exception.RuntimeError;
+import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
 import com.jlox.lox.grammar.token.TokenType;
@@ -51,11 +52,29 @@ public class Lox {
     BufferedReader reader = new BufferedReader(input);
 
     for(;;) {
+      hadError = false; //reset the flag -> if user makes a mistake, session is preserved
+
       System.out.print(">_ ");
       String line = reader.readLine();
       if (line == null) break;
-      run(line);
-      hadError = false; //reset the flag -> if user makes a mistake, session is preserved
+      runLineFromPrompt(line);
+    }
+  }
+
+  private static void runLineFromPrompt(String line) {
+    final Scanner scanner = new Scanner(line);
+    final List<Token> tokens = scanner.scanTokens();
+    if (hadError) return;
+
+    Parser parser = new Parser(tokens);
+    Object syntax = parser.parseREPL();
+    if (hadError) return;
+
+    if (syntax instanceof List) {
+      interpreter.interpret((List<Stmt>) syntax);
+    } else {
+      String result = interpreter.interpret((Expr) syntax);
+      if (result != null) System.out.println(result);
     }
   }
 
@@ -63,14 +82,16 @@ public class Lox {
    * runFile() and runPrompt() are 'wrappers' around this core method.
    */
   private static void run(String source) {
-    Scanner scanner = new Scanner(source);
-    List<Token> tokens = scanner.scanTokens();
-
-    Parser parser = new Parser(tokens);
-    List<Stmt> statements = parser.parse();
-
+    final Scanner scanner = new Scanner(source);
+    final List<Token> tokens = scanner.scanTokens();
     if (hadError) return;
-    interpreter.interpret(statements);
+
+    final Parser parser = new Parser(tokens);
+    List<Stmt> stmts = parser.parse();
+    if (hadError) return;
+
+    interpreter.interpret(stmts);
+
   }
 
   /**

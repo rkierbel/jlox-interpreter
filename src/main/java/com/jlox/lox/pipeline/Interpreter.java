@@ -7,6 +7,7 @@ import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static com.jlox.lox.grammar.token.TokenType.GREATER;
@@ -24,7 +25,9 @@ import static com.jlox.lox.grammar.token.TokenType.STAR;
 public class Interpreter implements Expr.Visitor<Object>,
         Stmt.Visitor<Void> {
 
-  private Environment environment = new Environment();
+  private final Environment global = new Environment();
+  private Environment environment = global;
+  private final HashMap<Expr, Integer> localEnvt = new HashMap<>();
 
   /**
    * Takes in a syntax tree for an expression, and evaluates it.
@@ -36,6 +39,16 @@ public class Interpreter implements Expr.Visitor<Object>,
       for (Stmt stmt : statements) execute(stmt);
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
+    }
+  }
+
+  public String interpret(Expr expr) {
+    try {
+      Object value = evaluate(expr);
+      return stringify(value);
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+      return null;
     }
   }
 
@@ -84,7 +97,7 @@ public class Interpreter implements Expr.Visitor<Object>,
       value = evaluate(stmt.initializer);
     }
     //In the absence of an initializer, the value is set to 'nil' in Lox -> null in Java
-    environment.define(stmt.name.lexeme, value);
+    environment.define(stmt.name, value);
     return null;
   }
 
@@ -159,13 +172,31 @@ public class Interpreter implements Expr.Visitor<Object>,
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
-    return environment.get(expr.name);
+    return variable(expr);
+  }
+
+  private Object variable(Expr.Variable expr) {
+    final Integer scope = localEnvt.get(expr);
+
+    if (scope != null) {
+      return environment.getFromEnvt(scope, expr.name.lexeme);
+    }
+    if (!global.contains(expr.name)) {
+      throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme + "'.");
+    }
+    return global.get(expr.name);
   }
 
   @Override
   public Object visitAssignExpr(Expr.Assign expr) {
     Object value = evaluate(expr.value);
-    environment.assign(expr.name, value);
+    final Integer scope = localEnvt.get(expr);
+
+    if (scope != null) {
+      environment.assignToEnvt(scope, expr.name, value);
+    } else {
+      global.assign(expr.name, value);
+    }
 
     return value;
   }

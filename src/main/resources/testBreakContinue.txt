@@ -1,0 +1,16 @@
+var a = 0;
+var temp = nil;
+
+for (var b = 1; a < 10000; b = temp + b) {
+  print a;
+  temp = a;
+  a = b;
+  if (b == 3) {
+    print "Continue";
+    continue;
+  }
+  if (b == 6) {
+    print "Breaking";
+    break;
+  }
+}

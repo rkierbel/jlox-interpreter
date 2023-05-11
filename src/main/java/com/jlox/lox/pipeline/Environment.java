@@ -44,11 +44,19 @@ public class Environment {
     throw new RuntimeError(name, "Undefined variable while getting '" + name + "'.");
   }
 
+  public Object getFromEnvt(Integer scope, String lexeme) {
+    return parent(scope).values.get(lexeme);
+  }
+
+
   /**
    * We voluntarily don't check if the name is present in values : this allows variable redefinition.
    */
-  void define(String name, Object value) {
-    values.put(name, value);
+  void define(Token name, Object value) {
+    if (values.containsKey(name.lexeme)) {
+      throw new RuntimeError(name, "A variable named '" + name.lexeme +  "' has already been declared before.");
+    }
+    values.put(name.lexeme, value);
   }
 
   /**
@@ -67,6 +75,31 @@ public class Environment {
     }
 
     throw new RuntimeError(name, "Undefined variable while assigning '" + name.lexeme + "'.");
+  }
+
+  public void assignToEnvt(int scope, Token token, Object value) {
+    final Environment environment = parent(scope);
+
+    if (!environment.values.containsKey(token.lexeme)) {
+      throw new RuntimeError(token, "Assigning to undefined variable '" + token.lexeme + "'.");
+    }
+    environment.values.put(token.lexeme, value);
+  }
+
+  private Environment parent(int scope) {
+    Environment current = this;
+
+    for (int i = 0; i < scope; i++) {
+      if (current != null) current = current.enclosing;
+    }
+    if (current == null) throw new RuntimeError("Error retrieving environment for variable definition or reference.");
+    return current;
+  }
+
+  public boolean contains(Token token) {
+    if (values.containsKey(token.lexeme)) return true;
+    if (enclosing != null) return enclosing.contains(token);
+    return false;
   }
 
 }

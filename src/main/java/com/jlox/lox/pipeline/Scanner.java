@@ -35,6 +35,8 @@ public class Scanner {
     keywords.put("nil", NIL);
     keywords.put("or", OR);
     keywords.put("print", PRINT);
+    keywords.put("break", BREAK);
+    keywords.put("continue", CONTINUE);
     keywords.put("return", RETURN);
     keywords.put("super", SUPER);
     keywords.put("this", THIS);
