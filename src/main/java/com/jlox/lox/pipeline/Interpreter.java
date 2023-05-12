@@ -6,7 +6,9 @@ import com.jlox.lox.exception.RuntimeError;
 import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.object.LoxCallable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -168,6 +170,32 @@ public class Interpreter implements Expr.Visitor<Object>,
       case BANG -> !isTruthy(right);
       default -> null;
     };
+  }
+
+  /**
+   * First, eval expression for the callee (should be an identifier that looks up the function by name).
+   * Then, eval each argument expression in order, store the resulting values in a list.
+   * Finally, perform the call
+   */
+  @Override
+  public Object visitCallExpr(Expr.Call expr) {
+    Object callee = evaluate(expr.callee);
+
+    List<Object> args = new ArrayList<>();
+    for (Expr arg : expr.arguments) {
+      args.add(evaluate(arg));
+    }
+
+    if (!(callee instanceof LoxCallable function)) {
+      throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+    }
+
+    if (args.size() != function.arity()) {
+      throw new RuntimeError(
+              expr.paren,
+              "Expected " + function.arity() + " arguments but got " + args.size() + ".");
+    }
+    return function.call(this, args);
   }
 
   @Override

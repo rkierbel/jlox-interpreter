@@ -309,7 +309,38 @@ public class Parser {
       return new Expr.Unary(operator, right);
     }
 
-    return primary();
+    return call();
+  }
+
+  private Expr call() {
+    Expr expr = primary(); //Left operand to the call
+
+    while (true) {
+      if (match(LEFT_PAREN)) {
+        expr = finishCall(expr); //Parse the call expression using the previously parsed expression as the callee
+      } else break;
+    }
+
+    return expr;
+  }
+
+  private Expr finishCall(Expr callee) {
+    List<Expr> args = new ArrayList<>();
+    int ARGS_MAX = 255;
+
+    if (!check(RIGHT_PAREN)) { //This check handles zero args call
+      do {
+        if (args.size() >= ARGS_MAX) {
+          //Don't throw -> the parser remains in a valid state, just found too many arguments
+          error(peek(), "A function call cannot have more than 255 arguments.");
+        }
+        args.add(expression());
+      } while (match(COMMA)); //When we don't find a comma, the args list must be done
+    }
+
+    Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+    return new Expr.Call(callee, paren, args);
   }
 
   private Expr primary() {

@@ -2,6 +2,8 @@ package com.jlox.lox.grammar.string;
 
 import com.jlox.lox.grammar.token.Token;
 
+import java.util.List;
+
 public abstract class Expr {
   public interface Visitor<R> {
     R visitBinaryExpr(Binary expr);
@@ -17,6 +19,8 @@ public abstract class Expr {
     R visitAssignExpr(Assign expr);
 
     R visitLogicalExpr(Logical expr);
+
+    R visitCallExpr(Call expr);
   }
 
   public static class Binary extends Expr {
@@ -122,6 +126,22 @@ public abstract class Expr {
     public final Expr left;
     public final Token operator;
     public final Expr right;
+  }
+
+  public static class Call extends Expr {
+    public Call(Expr callee, Token paren, List<Expr> arguments) {
+      this.callee = callee;
+      this.paren = paren;
+      this.arguments = arguments;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitCallExpr(this);
+    }
+    public final Expr callee;
+    public final Token paren;
+    public final List<Expr> arguments;
   }
 
 
