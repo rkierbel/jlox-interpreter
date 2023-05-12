@@ -6,6 +6,7 @@ import com.jlox.lox.exception.RuntimeError;
 import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.object.Environment;
 import com.jlox.lox.object.LoxCallable;
 
 import java.util.ArrayList;

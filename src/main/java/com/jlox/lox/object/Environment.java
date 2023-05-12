@@ -1,4 +1,4 @@
-package com.jlox.lox.pipeline;
+package com.jlox.lox.object;
 
 import com.jlox.lox.exception.RuntimeError;
 import com.jlox.lox.grammar.token.Token;
@@ -20,14 +20,14 @@ public class Environment {
   /**
    * For global scope Environment : ends the parent-pointer tree.
    */
-  Environment() {
+  public Environment() {
     this.enclosing = null;
   }
 
   /**
    * Creates new local scope within an enclosing Environment.
    */
-  Environment(Environment enclosing) {
+  public Environment(Environment enclosing) {
     this.enclosing = enclosing;
   }
 
@@ -35,7 +35,7 @@ public class Environment {
    * If the variable is found, return the value bound to it.
    * Walks up the chain of Environments to find the variable.
    */
-  Object get(Token name) {
+  public Object get(Token name) {
     if (values.containsKey(name.lexeme)) {
       return values.get(name.lexeme);
     }
@@ -52,7 +52,7 @@ public class Environment {
   /**
    * We voluntarily don't check if the name is present in values : this allows variable redefinition.
    */
-  void define(Token name, Object value) {
+  public void define(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {
       throw new RuntimeError(name, "A variable named '" + name.lexeme +  "' has already been declared before.");
     }
