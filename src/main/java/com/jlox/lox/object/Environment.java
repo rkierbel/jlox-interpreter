@@ -52,11 +52,11 @@ public class Environment {
   /**
    * We voluntarily don't check if the name is present in values : this allows variable redefinition.
    */
-  public void define(Token name, Object value) {
-    if (values.containsKey(name.lexeme)) {
-      throw new RuntimeError(name, "A variable named '" + name.lexeme +  "' has already been declared before.");
+  public void define(String lexeme, Object value) {
+    if (values.containsKey(lexeme)) {
+      throw new RuntimeError(null, "A variable named '" + lexeme +  "' has already been declared before.");
     }
-    values.put(name.lexeme, value);
+    values.put(lexeme, value);
   }
 
   /**

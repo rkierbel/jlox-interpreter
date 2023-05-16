@@ -13,25 +13,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.jlox.lox.grammar.token.TokenType.GREATER;
-import static com.jlox.lox.grammar.token.TokenType.GREATER_EQUAL;
-import static com.jlox.lox.grammar.token.TokenType.LESS;
-import static com.jlox.lox.grammar.token.TokenType.LESS_EQUAL;
-import static com.jlox.lox.grammar.token.TokenType.MINUS;
-import static com.jlox.lox.grammar.token.TokenType.OR;
-import static com.jlox.lox.grammar.token.TokenType.SLASH;
-import static com.jlox.lox.grammar.token.TokenType.STAR;
+import static com.jlox.lox.grammar.token.TokenType.*;
 
 /**
  * Provides the evaluation logic for each expression in order to produce a value from chunks of code.
  */
-public class Interpreter implements Expr.Visitor<Object>,
-        Stmt.Visitor<Void> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-  private final Environment global = new Environment();
-  private Environment environment = global;
+  private final Environment globals = new Environment(); //Fixed reference to the outermost global environment
+  private Environment environment = globals; //Tracks the current environment
   private final HashMap<Expr, Integer> localEnvt = new HashMap<>();
 
+  public Interpreter() {
+    globals.define("clock", new LoxCallable() {
+      @Override
+      public Object call(Interpreter interpreter, List<Object> args) {
+        return (double) System.currentTimeMillis() / 1000.0;
+      }
+
+      @Override
+      public int arity() {
+        return 0;
+      }
+
+      @Override
+      public String toString() { return "<native function>";}
+    });
+  }
   /**
    * Takes in a syntax tree for an expression, and evaluates it.
    *
@@ -100,7 +108,7 @@ public class Interpreter implements Expr.Visitor<Object>,
       value = evaluate(stmt.initializer);
     }
     //In the absence of an initializer, the value is set to 'nil' in Lox -> null in Java
-    environment.define(stmt.name, value);
+    environment.define(stmt.name.lexeme, value);
     return null;
   }
 
@@ -210,10 +218,10 @@ public class Interpreter implements Expr.Visitor<Object>,
     if (scope != null) {
       return environment.getFromEnvt(scope, expr.name.lexeme);
     }
-    if (!global.contains(expr.name)) {
+    if (!globals.contains(expr.name)) {
       throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme + "'.");
     }
-    return global.get(expr.name);
+    return globals.get(expr.name);
   }
 
   @Override
@@ -224,7 +232,7 @@ public class Interpreter implements Expr.Visitor<Object>,
     if (scope != null) {
       environment.assignToEnvt(scope, expr.name, value);
     } else {
-      global.assign(expr.name, value);
+      globals.assign(expr.name, value);
     }
 
     return value;
