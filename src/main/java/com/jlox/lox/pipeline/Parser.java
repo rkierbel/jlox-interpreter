@@ -350,7 +350,7 @@ public class Parser {
     if (match(IDENTIFIER)) return new Expr.Variable(previous()); //Parsing variable expression
 
     if (match(NUMBER, STRING)) {
-      return new Expr.Literal(previous().literal);
+      return new Expr.Literal(previous().literal());
     }
 
     if (match(LEFT_PAREN)) {
@@ -380,9 +380,9 @@ public class Parser {
     advance();
 
     while (!isAtEnd()) {
-      if (previous().type == SEMICOLON) return;
+      if (previous().type() == SEMICOLON) return;
 
-      switch (peek().type) {
+      switch (peek().type()) {
         case CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> {
           return;
         }
@@ -408,7 +408,7 @@ public class Parser {
 
   private boolean check(TokenType type) {
     if (isAtEnd()) return false;
-    return peek().type == type; //Never consumes the token, unlike match()
+    return peek().type() == type; //Never consumes the token, unlike match()
   }
 
   /**
@@ -423,7 +423,7 @@ public class Parser {
    * Checks if we are out of tokens to parse.
    */
   private boolean isAtEnd() {
-    return peek().type == EOF;
+    return peek().type() == EOF;
   }
 
   /**

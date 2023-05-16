@@ -108,7 +108,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
       value = evaluate(stmt.initializer);
     }
     //In the absence of an initializer, the value is set to 'nil' in Lox -> null in Java
-    environment.define(stmt.name.lexeme, value);
+    environment.define(stmt.name.lexeme(), value);
     return null;
   }
 
@@ -117,11 +117,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     Object left = evaluate(expr.left);
     Object right = evaluate(expr.right);
     if (List.of(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, SLASH, STAR)
-            .contains(expr.operator.type)) {
+            .contains(expr.operator.type())) {
       checkNumberOperands(expr.operator, left, right);
     }
 
-    return switch (expr.operator.type) {
+    return switch (expr.operator.type()) {
       case GREATER -> (double) left > (double) right;
       case GREATER_EQUAL -> (double) left >= (double) right;
       case LESS -> (double) left < (double) right;
@@ -171,7 +171,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   public Object visitUnaryExpr(Expr.Unary expr) {
     Object right = evaluate(expr.right);
 
-    return switch (expr.operator.type) {
+    return switch (expr.operator.type()) {
       case MINUS -> {
         checkNumberOperand(expr.operator, right);
         yield -(double) right;
@@ -216,10 +216,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Integer scope = localEnvt.get(expr);
 
     if (scope != null) {
-      return environment.getFromEnvt(scope, expr.name.lexeme);
+      return environment.getFromEnvt(scope, expr.name.lexeme());
     }
     if (!globals.contains(expr.name)) {
-      throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme + "'.");
+      throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme() + "'.");
     }
     return globals.get(expr.name);
   }
@@ -258,7 +258,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     //Evaluates the left operand first to see if we can short-circuit
     Object left = evaluate(expr.left);
 
-    if (expr.operator.type == OR) {
+    if (expr.operator.type() == OR) {
       if (isTruthy(left)) return left;
     } else {
       if (!isTruthy(left)) return left;
@@ -275,7 +275,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
       } catch (Jump.Break b) {
         break;
       } catch (Jump.Continue c) {
-        continue;
       }
     }
     return null;

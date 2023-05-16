@@ -36,8 +36,8 @@ public class Environment {
    * Walks up the chain of Environments to find the variable.
    */
   public Object get(Token name) {
-    if (values.containsKey(name.lexeme)) {
-      return values.get(name.lexeme);
+    if (values.containsKey(name.lexeme())) {
+      return values.get(name.lexeme());
     }
     if (enclosing != null) return enclosing.get(name);
     //It's ok to refer to a variable before it is defined only if the statement doesn't cause the variable to be evaluated
@@ -64,8 +64,8 @@ public class Environment {
    * Walks up the Environment parent-pointer tree.
    */
   public void assign(Token name, Object value) {
-    if (values.containsKey(name.lexeme)) {
-      values.put(name.lexeme, value);
+    if (values.containsKey(name.lexeme())) {
+      values.put(name.lexeme(), value);
       return;
     }
 
@@ -74,16 +74,16 @@ public class Environment {
       return;
     }
 
-    throw new RuntimeError(name, "Undefined variable while assigning '" + name.lexeme + "'.");
+    throw new RuntimeError(name, "Undefined variable while assigning '" + name.lexeme() + "'.");
   }
 
   public void assignToEnvt(int scope, Token token, Object value) {
     final Environment environment = parent(scope);
 
-    if (!environment.values.containsKey(token.lexeme)) {
-      throw new RuntimeError(token, "Assigning to undefined variable '" + token.lexeme + "'.");
+    if (!environment.values.containsKey(token.lexeme())) {
+      throw new RuntimeError(token, "Assigning to undefined variable '" + token.lexeme() + "'.");
     }
-    environment.values.put(token.lexeme, value);
+    environment.values.put(token.lexeme(), value);
   }
 
   private Environment parent(int scope) {
@@ -97,7 +97,7 @@ public class Environment {
   }
 
   public boolean contains(Token token) {
-    if (values.containsKey(token.lexeme)) return true;
+    if (values.containsKey(token.lexeme())) return true;
     if (enclosing != null) return enclosing.contains(token);
     return false;
   }
