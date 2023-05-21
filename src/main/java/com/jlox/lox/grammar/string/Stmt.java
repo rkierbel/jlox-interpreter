@@ -7,6 +7,8 @@ import java.util.List;
 public abstract class Stmt {
   public interface Visitor<R> {
 
+    R visitFunctionStmt(Function stmt);
+
     R visitBlockStmt(Block stmt);
 
     R visitExpressionStmt(Expression stmt);
@@ -21,6 +23,22 @@ public abstract class Stmt {
 
     R visitBreakStmt(Break stmt);
     R visitContinueStmt(Continue stmt);
+  }
+
+  public static class Function extends Stmt {
+    public Function(Token name, List<Token> params, List<Stmt> body) {
+      this.name = name;
+      this.params = params;
+      this.body = body;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitFunctionStmt(this);
+    }
+    public final Token name;
+    public final List<Token> params;
+    public final List<Stmt> body;
   }
 
   public static class Block extends Stmt {
