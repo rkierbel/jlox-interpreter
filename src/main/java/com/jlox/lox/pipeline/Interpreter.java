@@ -1,7 +1,7 @@
 package com.jlox.lox.pipeline;
 
 import com.jlox.lox.Lox;
-import com.jlox.lox.exception.Jump;
+import com.jlox.lox.exception.CtrlFlow;
 import com.jlox.lox.exception.RuntimeError;
 import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
@@ -93,7 +93,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
    */
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-    LoxFunction function = new LoxFunction(stmt);
+    //Captures the current environment as closure when creating the function
+    LoxFunction function = new LoxFunction(stmt, environment);
     environment.define(stmt.name.lexeme(), function);
     return null;
   }
@@ -261,7 +262,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     return null;
   }
 
-
   /**
    * Since Lox is dynamically typed and allows for any operand to represent truthiness.
    * As such, a logic operator will return a value with appropriate truthiness : the operands themselves.
@@ -285,22 +285,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     while (isTruthy(evaluate(stmt.condition))) {
       try {
         execute(stmt.body);
-      } catch (Jump.Break b) {
+      } catch (CtrlFlow.Break b) {
         break;
-      } catch (Jump.Continue c) {
+      } catch (CtrlFlow.Continue c) {
       }
     }
     return null;
   }
 
   @Override
+  public Void visitReturnStmt(Stmt.Return stmt) {
+    Object value = null;
+    if (stmt.value != null) value = evaluate(stmt.value);
+    throw new CtrlFlow.Return(value);
+  }
+
+  @Override
   public Void visitBreakStmt(Stmt.Break stmt) {
-    throw new Jump.Break();
+    throw new CtrlFlow.Break();
   }
 
   @Override
   public Void visitContinueStmt(Stmt.Continue stmt) {
-    throw new Jump.Continue();
+    throw new CtrlFlow.Continue();
   }
 
   private String stringify(Object obj) {

@@ -22,7 +22,10 @@ public abstract class Stmt {
     R visitWhileStmt(While stmt);
 
     R visitBreakStmt(Break stmt);
+
     R visitContinueStmt(Continue stmt);
+
+    R visitReturnStmt(Return stmt);
   }
 
   public static class Function extends Stmt {
@@ -36,6 +39,7 @@ public abstract class Stmt {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitFunctionStmt(this);
     }
+
     public final Token name;
     public final List<Token> params;
     public final List<Stmt> body;
@@ -133,7 +137,7 @@ public abstract class Stmt {
     }
 
     @Override
-   public  <R> R accept(final Visitor<R> visitor) {
+    public <R> R accept(final Visitor<R> visitor) {
       return visitor.visitBreakStmt(this);
     }
 
@@ -148,6 +152,21 @@ public abstract class Stmt {
       return visitor.visitContinueStmt(this);
     }
 
+  }
+
+  public static class Return extends Stmt {
+    public Return(Token keyword, Expr value) {
+      this.keyword = keyword;
+      this.value = value;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitReturnStmt(this);
+    }
+
+    public final Token keyword;
+    public final Expr value;
   }
 
 

@@ -89,6 +89,7 @@ public class Parser {
     if (match(FOR)) return forStatement();
     if (match(IF)) return ifStatement();
     if (match(WHILE)) return whileStatement();
+    if (match(RETURN)) return returnStatement();
     if (match(BREAK)) return breakStatement();
     if (match(CONTINUE)) return continueStatement();
     if (match(PRINT)) return printStatement();
@@ -155,6 +156,16 @@ public class Parser {
     Stmt body = statement();
 
     return new Stmt.While(condition, body);
+  }
+
+  private Stmt returnStatement() {
+    Token keyword = previous();
+    Expr value = null;
+    if (!check(SEMICOLON)) {
+      value = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after return value.");
+    return new Stmt.Return(keyword, value);
   }
 
   private Stmt breakStatement() {

@@ -1,5 +1,6 @@
 package com.jlox.lox.object;
 
+import com.jlox.lox.exception.CtrlFlow;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.pipeline.Interpreter;
 
@@ -8,9 +9,12 @@ import java.util.List;
 public class LoxFunction implements LoxCallable {
 
   private final Stmt.Function declaration;
+  private final Environment closure;
 
-  public LoxFunction(Stmt.Function declaration) {
+  public LoxFunction(Stmt.Function declaration,
+                     Environment closure) {
     this.declaration = declaration;
+    this.closure = closure;
   }
 
   /**
@@ -20,16 +24,20 @@ public class LoxFunction implements LoxCallable {
   @Override
   public Object call(Interpreter interpreter,
                      List<Object> args) {
-    Environment env = new Environment(interpreter.globals);
+    Environment env = new Environment(closure);
     //Walk the parameters' list and bind variables
     for (int i = 0; i < declaration.params.size(); i++)
       env.define(declaration.params.get(i).lexeme(), args.get(i));
 
-    /*
-    executeBlock() will then discard the function local environment and restore the one active at the callsite
-    This is where the code of the function becomes a living invocation
+    try {
+      /*
+       executeBlock() will then discard the function local environment and restore the one active at the callsite
+       This is where the code of the function becomes a living invocation
      */
-    interpreter.executeBlock(declaration.body, env);
+      interpreter.executeBlock(declaration.body, env);
+    } catch (CtrlFlow.Return returnValue) {
+      return returnValue.value;
+    }
     return null;
   }
 
