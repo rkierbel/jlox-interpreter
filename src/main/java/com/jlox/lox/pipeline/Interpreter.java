@@ -13,6 +13,7 @@ import com.jlox.lox.object.LoxFunction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.jlox.lox.grammar.token.TokenType.*;
 
@@ -23,7 +24,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   public final Environment globals = new Environment(); //Fixed reference to the outermost global environment
   private Environment environment = globals; //Tracks the current environment
-  private final HashMap<Expr, Integer> localEnvt = new HashMap<>();
+  private final Map<Expr, Integer> locals = new HashMap<>();
 
   public Interpreter() {
     globals.define("clock", new LoxCallable() {
@@ -68,6 +69,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     statement.accept(this);
   }
 
+  public void resolve(Expr expr, int depth) {
+    locals.put(expr, depth);
+  }
 
   @Override
   public Void visitBlockStmt(Stmt.Block stmt) {
@@ -223,28 +227,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
-    return variable(expr);
+    return lookUpVariable(expr);
   }
 
-  private Object variable(Expr.Variable expr) {
-    final Integer scope = localEnvt.get(expr);
+  private Object lookUpVariable(Expr.Variable expr) {
+    //Look up the resolved distance in the map
+    final Integer hops = locals.get(expr);
 
-    if (scope != null) {
-      return environment.getFromEnvt(scope, expr.name.lexeme());
+    if (hops != null) {
+      return environment.getFromEnvt(hops, expr.name.lexeme());
     }
     if (!globals.contains(expr.name)) {
       throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme() + "'.");
-    }
+    } //If hops is null, then must be a global variable
     return globals.get(expr.name);
   }
 
   @Override
   public Object visitAssignExpr(Expr.Assign expr) {
     Object value = evaluate(expr.value);
-    final Integer scope = localEnvt.get(expr);
+    final Integer hops = locals.get(expr);
 
-    if (scope != null) {
-      environment.assignToEnvt(scope, expr.name, value);
+    if (hops != null) {
+      environment.assignToEnvt(hops, expr.name, value);
     } else {
       globals.assign(expr.name, value);
     }

@@ -7,6 +7,7 @@ import com.jlox.lox.grammar.token.Token;
 import com.jlox.lox.grammar.token.TokenType;
 import com.jlox.lox.pipeline.Interpreter;
 import com.jlox.lox.pipeline.Parser;
+import com.jlox.lox.pipeline.Resolver;
 import com.jlox.lox.pipeline.Scanner;
 
 import java.io.BufferedReader;
@@ -24,7 +25,7 @@ public class Lox {
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
 
-  public static void main(String ...args) throws IOException {
+  public static void main(String... args) throws IOException {
     if (args.length > 1) {
       System.exit(64); // exit codes the use conventions defined in the UNIX “sysexits.h” header
     } else if (args.length == 1) {
@@ -51,7 +52,7 @@ public class Lox {
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
 
-    for(;;) {
+    for (; ; ) {
       hadError = false; //reset the flag -> if user makes a mistake, session is preserved
 
       System.out.print(">_ ");
@@ -62,16 +63,18 @@ public class Lox {
   }
 
   private static void runLineFromPrompt(String line) {
-    final Scanner scanner = new Scanner(line);
-    final List<Token> tokens = scanner.scanTokens();
+    Scanner scanner = new Scanner(line);
+    List<Token> tokens = scanner.scanTokens();
     if (hadError) return;
 
     Parser parser = new Parser(tokens);
+    Resolver resolver = new Resolver(interpreter);
     Object syntax = parser.parseREPL();
     if (hadError) return;
 
-    if (syntax instanceof List) {
-      interpreter.interpret((List<Stmt>) syntax);
+    if (syntax instanceof List statements) {
+      resolver.resolve(statements);
+      interpreter.interpret(statements);
     } else {
       String result = interpreter.interpret((Expr) syntax);
       if (result != null) System.out.println(result);
@@ -87,11 +90,13 @@ public class Lox {
     if (hadError) return;
 
     final Parser parser = new Parser(tokens);
-    List<Stmt> stmts = parser.parse();
+    List<Stmt> statements = parser.parse();
     if (hadError) return;
 
-    interpreter.interpret(stmts);
+    Resolver resolver = new Resolver(interpreter);
+    resolver.resolve(statements);
 
+    interpreter.interpret(statements);
   }
 
   /**
@@ -108,6 +113,7 @@ public class Lox {
       report(token.line(), " at '" + token.lexeme() + "'", message);
     }
   }
+
   private static void report(int line,
                              String where,
                              String message) {

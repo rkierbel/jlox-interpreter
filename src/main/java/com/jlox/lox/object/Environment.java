@@ -86,10 +86,10 @@ public class Environment {
     environment.values.put(token.lexeme(), value);
   }
 
-  private Environment parent(int scope) {
+  private Environment parent(int hops) {
     Environment current = this;
 
-    for (int i = 0; i < scope; i++) {
+    for (int i = 0; i < hops; i++) { //Walks a fixed distance up the parent chain
       if (current != null) current = current.enclosing;
     }
     if (current == null) throw new RuntimeError("Error retrieving environment for variable definition or reference.");
