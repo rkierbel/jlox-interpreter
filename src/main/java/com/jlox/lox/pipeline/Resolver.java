@@ -4,6 +4,7 @@ import com.jlox.lox.Lox;
 import com.jlox.lox.grammar.string.Expr;
 import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
+import com.jlox.lox.helper.FunctionType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Stack;
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   private final Interpreter interpreter;
-
+  private FunctionType currentFunction = FunctionType.NONE;
   /**
    * Used for local block scopes.
    */
@@ -100,7 +101,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     allows the function to recursively refer to itself
      */
     define(stmt.name);
-    resolveFunction(stmt);
+    resolveFunction(stmt, FunctionType.FUNCTION);
     return null;
   }
 
@@ -164,12 +165,15 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitReturnStmt(Stmt.Return stmt) {
+    if (currentFunction == FunctionType.NONE) {
+      Lox.error(stmt.keyword, "Can't return from top-level code.");
+    }
     if (stmt.value != null) resolve(stmt.value);
     return null;
   }
 
   private void beginScope() {
-    scopes.push(new HashMap<String, Boolean>());
+    scopes.push(new HashMap<>());
   }
 
   private void endScope() {
@@ -222,7 +226,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
   }
 
-  private void resolveFunction(Stmt.Function function) {
+  private void resolveFunction(Stmt.Function function, FunctionType type) {
+    FunctionType enclosingFunction = currentFunction;
+    currentFunction = type;
+
     beginScope();
     for (Token param : function.params) {
       declare(param);
@@ -230,5 +237,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
     resolve(function.body);
     endScope();
+    currentFunction = enclosingFunction;
   }
 }

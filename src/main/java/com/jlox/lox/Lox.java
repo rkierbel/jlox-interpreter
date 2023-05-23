@@ -74,6 +74,7 @@ public class Lox {
 
     if (syntax instanceof List statements) {
       resolver.resolve(statements);
+      if (hadError) return;
       interpreter.interpret(statements);
     } else {
       String result = interpreter.interpret((Expr) syntax);
@@ -85,16 +86,17 @@ public class Lox {
    * runFile() and runPrompt() are 'wrappers' around this core method.
    */
   private static void run(String source) {
-    final Scanner scanner = new Scanner(source);
-    final List<Token> tokens = scanner.scanTokens();
+    Scanner scanner = new Scanner(source);
+    List<Token> tokens = scanner.scanTokens();
     if (hadError) return;
 
-    final Parser parser = new Parser(tokens);
+    Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
     if (hadError) return;
 
     Resolver resolver = new Resolver(interpreter);
     resolver.resolve(statements);
+    if (hadError) return;
 
     interpreter.interpret(statements);
   }
