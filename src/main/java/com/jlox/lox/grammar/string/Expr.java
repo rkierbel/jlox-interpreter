@@ -6,6 +6,9 @@ import java.util.List;
 
 public abstract class Expr {
   public interface Visitor<R> {
+
+    R visitGetExpr(Get expr);
+
     R visitBinaryExpr(Binary expr);
 
     R visitGroupingExpr(Grouping expr);
@@ -21,6 +24,20 @@ public abstract class Expr {
     R visitLogicalExpr(Logical expr);
 
     R visitCallExpr(Call expr);
+  }
+
+  public static class Get extends Expr {
+    public Get(Expr object, Token name) {
+      this.object = object;
+      this.name = name;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitGetExpr(this);
+    }
+    public final Expr object;
+    public final Token name;
   }
 
   public static class Binary extends Expr {

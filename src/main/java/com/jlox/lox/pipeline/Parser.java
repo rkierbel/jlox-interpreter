@@ -360,7 +360,11 @@ public class Parser {
     while (true) {
       if (match(LEFT_PAREN)) {
         expr = finishCall(expr); //Parse the call expression using the previously parsed expression as the callee
-      } else break;
+      } else if (match(DOT)) {
+        Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+        expr = new Expr.Get(expr, name);
+      }
+      else break;
     }
 
     return expr;

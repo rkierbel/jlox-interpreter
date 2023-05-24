@@ -27,4 +27,9 @@ class LoxTest {
   void testBasicClass_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicClass.txt");
   }
+
+  @Test
+  void testBasicInstance_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicInstance.txt");
+  }
 }

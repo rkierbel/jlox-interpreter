@@ -96,6 +96,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
+  @Override
+  public Void visitGetExpr(Expr.Get expr) {
+    //Only recurse to the expression left of the dot operator, ie the property name is not processed yet
+    resolve(expr.object);
+    return null;
+  }
+
   /**
    * Defining the name eagerly (unlike when resolving variables) before resolving the function's body
    * allows the function to recursively refer to itself.

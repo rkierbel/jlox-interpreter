@@ -10,6 +10,7 @@ import com.jlox.lox.object.Environment;
 import com.jlox.lox.object.LoxCallable;
 import com.jlox.lox.object.LoxClass;
 import com.jlox.lox.object.LoxFunction;
+import com.jlox.lox.object.LoxInstance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,6 +99,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     LoxClass clazz  = new LoxClass(stmt.name.lexeme()); //Turn class syntax node into its runtime representation
     environment.assign(stmt.name, clazz); //Store the runtime object in the variable previously created
     return null;
+  }
+
+  @Override
+  public Object visitGetExpr(Expr.Get expr) {
+    Object obj = evaluate(expr.object);
+
+    if (obj instanceof LoxInstance instance)
+      return instance.get(expr.name);
+
+    //If the evaluated object is not a class instance, eg a literal, throw a runtime error
+    throw new RuntimeError(expr.name, "Only instances have properties.");
   }
 
   /**
