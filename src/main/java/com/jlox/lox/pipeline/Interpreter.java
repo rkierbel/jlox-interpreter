@@ -112,6 +112,20 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     throw new RuntimeError(expr.name, "Only instances have properties.");
   }
 
+  @Override
+  public Object visitSetExpr(Expr.Set expr) {
+    Object obj = evaluate(expr.object);
+
+    if (!(obj instanceof LoxInstance instance)) {
+      throw new RuntimeError(expr.name, "Only instances have fields.");
+    }
+
+    Object value = evaluate(expr.value);
+    instance.set(expr.name, value);
+
+    return value;
+  }
+
   /**
    * Takes a function syntax node (compile-time representation of the function).
    * Converts it to its runtime representation.

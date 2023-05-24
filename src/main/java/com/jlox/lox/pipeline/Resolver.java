@@ -103,6 +103,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
+  @Override
+  public Void visitSetExpr(Expr.Set expr) {
+    resolve(expr.value);
+    resolve(expr.object);
+    return null;
+  }
+
   /**
    * Defining the name eagerly (unlike when resolving variables) before resolving the function's body
    * allows the function to recursively refer to itself.
