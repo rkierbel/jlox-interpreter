@@ -22,15 +22,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   private final Interpreter interpreter;
   private FunctionType currentFunction = FunctionType.NONE;
-  /**
-   * Used for local block scopes.
-   */
-  private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+  private final Stack<Map<String, Boolean>> scopes = new Stack<>(); //Used for local block scopes
 
   public Resolver(Interpreter interpreter) {
     this.interpreter = interpreter;
   }
-
 
   @Override
   public Void visitBinaryExpr(Expr.Binary expr) {
@@ -90,6 +86,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(expr.callee);
 
     for (Expr argument : expr.arguments) resolve(argument);
+    return null;
+  }
+
+  @Override
+  public Void visitClassStmt(Stmt.Class stmt) {
     return null;
   }
 

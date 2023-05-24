@@ -91,6 +91,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
   }
 
+  @Override
+  public Void visitClassStmt(Stmt.Class stmt) {
+    return null;
+  }
+
   /**
    * Takes a function syntax node (compile-time representation of the function).
    * Converts it to its runtime representation.
