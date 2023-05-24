@@ -1,0 +1,7 @@
+class YouGiveLove {
+  what() {
+    return "a bad name!";
+  }
+}
+
+print YouGiveLove;

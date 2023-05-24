@@ -8,6 +8,7 @@ import com.jlox.lox.grammar.string.Stmt;
 import com.jlox.lox.grammar.token.Token;
 import com.jlox.lox.object.Environment;
 import com.jlox.lox.object.LoxCallable;
+import com.jlox.lox.object.LoxClass;
 import com.jlox.lox.object.LoxFunction;
 
 import java.util.ArrayList;
@@ -93,6 +94,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
+    environment.define(stmt.name.lexeme(), null); //Declare class name in current environment
+    LoxClass clazz  = new LoxClass(stmt.name.lexeme()); //Turn class syntax node into its runtime representation
+    environment.assign(stmt.name, clazz); //Store the runtime object in the variable previously created
     return null;
   }
 

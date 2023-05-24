@@ -22,4 +22,9 @@ class LoxTest {
   void testBreakContinue_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testBreakContinue.txt");
   }
+
+  @Test
+  void testBasicClass_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicClass.txt");
+  }
 }

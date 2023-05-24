@@ -54,7 +54,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitVariableExpr(Expr.Variable expr) {
-    if (scopes.isEmpty() &&
+    if (!scopes.isEmpty() &&
             scopes.peek().get(expr.name.lexeme()) == Boolean.FALSE) {
       //Handle case where value is used while having been declared but not defined
       Lox.error(expr.name,
@@ -91,16 +91,18 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
+    declare(stmt.name);
+    define(stmt.name);
     return null;
   }
 
+  /**
+   * Defining the name eagerly (unlike when resolving variables) before resolving the function's body
+   * allows the function to recursively refer to itself.
+   */
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
     declare(stmt.name);
-    /*
-    Defining the name eagerly (unlike when resolving variables) before resolving the function's body
-    allows the function to recursively refer to itself
-     */
     define(stmt.name);
     resolveFunction(stmt, FunctionType.FUNCTION);
     return null;
