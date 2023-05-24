@@ -32,4 +32,9 @@ class LoxTest {
   void testBasicInstance_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicInstance.txt");
   }
+
+  @Test
+  void testMethodPropertyAccess_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\propertyAccessMethod.txt");
+  }
 }

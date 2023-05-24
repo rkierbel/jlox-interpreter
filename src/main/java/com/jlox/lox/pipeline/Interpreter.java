@@ -96,7 +96,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
     environment.define(stmt.name.lexeme(), null); //Declare class name in current environment
-    LoxClass clazz  = new LoxClass(stmt.name.lexeme()); //Turn class syntax node into its runtime representation
+
+    Map<String, LoxFunction> methods = new HashMap<>();
+    for (Stmt.Function method : stmt.methods) {
+      LoxFunction function = new LoxFunction(method, environment);
+      methods.put(method.name.lexeme(), function);
+    }
+
+    LoxClass clazz = new LoxClass(stmt.name.lexeme(), methods); //Turn class syntax node into its runtime representation
     environment.assign(stmt.name, clazz); //Store the runtime object in the variable previously created
     return null;
   }

@@ -19,6 +19,10 @@ public class LoxInstance {
     if (fields.containsKey(name.lexeme()))
       return fields.get(name.lexeme());
 
+    //If no matching field found, lookup methods
+    LoxFunction method = clazz.findMethod(name.lexeme());
+    if (method != null) return method;
+
     throw new RuntimeError(name, "Undefined property '" + name.lexeme() + "'.");
   }
 
