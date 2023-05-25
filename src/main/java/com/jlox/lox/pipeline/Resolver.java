@@ -21,6 +21,7 @@ import java.util.Stack;
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   private final Interpreter interpreter;
+  private ClassType currentClassType = ClassType.NONE;
   private FunctionType currentFunction = FunctionType.NONE;
   private final Stack<Map<String, Boolean>> scopes = new Stack<>(); //Used for local block scopes
 
@@ -91,12 +92,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitThisExpr(Expr.This expr) {
+    if (currentClassType == ClassType.NONE) {
+      Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+      return null;
+    }
     resolveLocal(expr, expr.keyword);
     return null;
   }
 
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
+    ClassType enclosingClassType = currentClassType;
+    currentClassType = ClassType.CLASS;
+
     declare(stmt.name);
     define(stmt.name);
 
@@ -109,7 +117,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
       resolveFunction(method, declaration);
     }
     endScope();
-
+    currentClassType = enclosingClassType;
     return null;
   }
 
@@ -272,5 +280,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(function.body);
     endScope();
     currentFunction = enclosingFunction;
+  }
+
+  private enum ClassType {
+    NONE,
+    CLASS
   }
 }
