@@ -46,6 +46,18 @@ public class LoxFunction implements LoxCallable {
     return declaration.params.size();
   }
 
+  /**
+   * Creates a new environment nestled in the method's original closure.
+   * When the method is called, that new environment will become the parent of the method's body environment.
+   * 'this' is declared as a local variable in that new environment.
+   * It is bound to the instance the method is being accessed from.
+   */
+  public LoxFunction bind(LoxInstance instance) {
+    Environment env = new Environment(closure);
+    env.define("this", instance);
+    return new LoxFunction(declaration, env);
+  }
+
   @Override
   public String toString() {
     return "<fn " + declaration.name.lexeme() + ">";

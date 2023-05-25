@@ -7,6 +7,8 @@ import java.util.List;
 public abstract class Expr {
   public interface Visitor<R> {
 
+    R visitThisExpr(This expr);
+
     R visitGetExpr(Get expr);
 
     R visitSetExpr(Set expr);
@@ -26,6 +28,18 @@ public abstract class Expr {
     R visitLogicalExpr(Logical expr);
 
     R visitCallExpr(Call expr);
+  }
+
+  public static class This extends Expr {
+    public This(Token keyword) {
+      this.keyword = keyword;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitThisExpr(this);
+    }
+    public final Token keyword;
   }
 
   public static class Get extends Expr {

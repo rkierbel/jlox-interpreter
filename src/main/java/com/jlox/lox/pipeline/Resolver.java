@@ -90,14 +90,26 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   @Override
+  public Void visitThisExpr(Expr.This expr) {
+    resolveLocal(expr, expr.keyword);
+    return null;
+  }
+
+  @Override
   public Void visitClassStmt(Stmt.Class stmt) {
     declare(stmt.name);
     define(stmt.name);
+
+    beginScope();
+    //Whenever a 'this' expression is encountered inside a method, will resolve to a 'local variable'
+    scopes.peek().put("this", true);
 
     for (Stmt.Function method : stmt.methods) {
       FunctionType declaration = FunctionType.METHOD;
       resolveFunction(method, declaration);
     }
+    endScope();
+
     return null;
   }
 

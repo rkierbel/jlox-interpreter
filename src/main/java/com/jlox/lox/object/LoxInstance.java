@@ -21,7 +21,11 @@ public class LoxInstance {
 
     //If no matching field found, lookup methods
     LoxFunction method = clazz.findMethod(name.lexeme());
-    if (method != null) return method;
+    /*
+    Since the resolver has a scope for 'this', the interpreter needs to create a corresponding environment for it.
+    The environment is created after the method on the instance has been found.
+     */
+    if (method != null) return method.bind(this);
 
     throw new RuntimeError(name, "Undefined property '" + name.lexeme() + "'.");
   }

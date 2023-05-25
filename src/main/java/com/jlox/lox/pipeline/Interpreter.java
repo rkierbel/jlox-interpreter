@@ -109,6 +109,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   }
 
   @Override
+  public Object visitThisExpr(Expr.This expr) {
+    return lookUpVariable(expr.keyword, expr);
+  }
+
+  @Override
   public Object visitGetExpr(Expr.Get expr) {
     Object obj = evaluate(expr.object);
 
@@ -269,20 +274,20 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
-    return lookUpVariable(expr);
+    return lookUpVariable(expr.name, expr);
   }
 
-  private Object lookUpVariable(Expr.Variable expr) {
+  private Object lookUpVariable(Token name, Expr expr) {
     //Look up the resolved distance in the map
     final Integer hops = locals.get(expr);
 
     if (hops != null) {
-      return environment.getFromEnvt(hops, expr.name.lexeme());
+      return environment.getFromEnvt(hops, name.lexeme());
     }
-    if (!globals.contains(expr.name)) {
-      throw new RuntimeError(expr.name, "Use of undeclared variable '" + expr.name.lexeme() + "'.");
+    if (!globals.contains(name)) {
+      throw new RuntimeError(name, "Use of undeclared variable '" + name.lexeme() + "'.");
     } //If hops is null, then must be a global variable
-    return globals.get(expr.name);
+    return globals.get(name);
   }
 
   @Override
