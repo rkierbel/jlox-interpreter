@@ -339,7 +339,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         execute(stmt.body);
       } catch (CtrlFlow.Break b) {
         break;
-      } catch (CtrlFlow.Continue c) {
+      } catch (CtrlFlow.Continue ignored) {
+        continue;
       }
     }
     return null;

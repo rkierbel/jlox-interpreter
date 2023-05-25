@@ -8,8 +8,9 @@ import java.io.IOException;
 @SpringBootTest
 class LoxTest {
 
+
   @Test
-  void testScoping_RunFromFile() throws IOException {
+  void testScriptScopes_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testScriptScopes.txt");
   }
 
@@ -20,7 +21,38 @@ class LoxTest {
 
   @Test
   void testBreakContinue_RunFromFile() throws IOException {
+    //continue fails - infinite loop check token handling
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\testBreakContinue.txt");
+  }
+
+  @Test
+  void testBadReturnStatement_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\badReturnStatement.txt");
+  }
+
+  @Test
+  void testFibFunction_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\fibFunction.txt");
+  }
+
+  @Test
+  void testCounterFunction_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\counterFunction.txt");
+  }
+
+  @Test
+  void testPropertyAccessMethod_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\propertyAccessMethod.txt");
+  }
+
+  @Test
+  void testMethodRefUserDefField_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\methodRefUserDefField.txt");
+  }
+
+  @Test
+  void testMethodRefUserDefField2_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\methodRefUserDefField2.txt");
   }
 
   @Test
@@ -34,7 +66,22 @@ class LoxTest {
   }
 
   @Test
-  void testMethodPropertyAccess_RunFromFile() throws IOException {
-    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\propertyAccessMethod.txt");
+  void testInvalidThis_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\invalidThis.txt");
+  }
+
+  @Test
+  void testBasicThis_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicThis.txt");
+  }
+
+  @Test
+  void testBasicThis2_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicThis2.txt");
+  }
+
+  @Test
+  void testCallbackThis_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\callbackThis.txt");
   }
 }
