@@ -8,11 +8,14 @@ import java.util.List;
 
 public class LoxFunction implements LoxCallable {
 
+  private final boolean isInitializer;
   private final Stmt.Function declaration;
   private final Environment closure;
 
-  public LoxFunction(Stmt.Function declaration,
+  public LoxFunction(boolean isInitializer,
+                     Stmt.Function declaration,
                      Environment closure) {
+    this.isInitializer = isInitializer;
     this.declaration = declaration;
     this.closure = closure;
   }
@@ -36,8 +39,12 @@ public class LoxFunction implements LoxCallable {
      */
       interpreter.executeBlock(declaration.body, env);
     } catch (CtrlFlow.Return returnValue) {
+      if (isInitializer) return closure.getFromEnvt(0, "this");
       return returnValue.value;
     }
+
+    //init() always returns 'this' even when directly called
+    if (isInitializer) return closure.getFromEnvt(0, "this");
     return null;
   }
 
@@ -55,7 +62,7 @@ public class LoxFunction implements LoxCallable {
   public LoxFunction bind(LoxInstance instance) {
     Environment env = new Environment(closure);
     env.define("this", instance);
-    return new LoxFunction(declaration, env);
+    return new LoxFunction(isInitializer, declaration, env);
   }
 
   @Override
