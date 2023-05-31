@@ -11,7 +11,46 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jlox.lox.grammar.token.TokenType.*;
+import static com.jlox.lox.grammar.token.TokenType.AND;
+import static com.jlox.lox.grammar.token.TokenType.BANG;
+import static com.jlox.lox.grammar.token.TokenType.BANG_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.BREAK;
+import static com.jlox.lox.grammar.token.TokenType.CLASS;
+import static com.jlox.lox.grammar.token.TokenType.COMMA;
+import static com.jlox.lox.grammar.token.TokenType.CONTINUE;
+import static com.jlox.lox.grammar.token.TokenType.DOT;
+import static com.jlox.lox.grammar.token.TokenType.ELSE;
+import static com.jlox.lox.grammar.token.TokenType.EOF;
+import static com.jlox.lox.grammar.token.TokenType.EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.EQUAL_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.FALSE;
+import static com.jlox.lox.grammar.token.TokenType.FOR;
+import static com.jlox.lox.grammar.token.TokenType.FUN;
+import static com.jlox.lox.grammar.token.TokenType.GREATER;
+import static com.jlox.lox.grammar.token.TokenType.GREATER_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.IDENTIFIER;
+import static com.jlox.lox.grammar.token.TokenType.IF;
+import static com.jlox.lox.grammar.token.TokenType.LEFT_BRACE;
+import static com.jlox.lox.grammar.token.TokenType.LEFT_PAREN;
+import static com.jlox.lox.grammar.token.TokenType.LESS;
+import static com.jlox.lox.grammar.token.TokenType.LESS_EQUAL;
+import static com.jlox.lox.grammar.token.TokenType.MINUS;
+import static com.jlox.lox.grammar.token.TokenType.NIL;
+import static com.jlox.lox.grammar.token.TokenType.NUMBER;
+import static com.jlox.lox.grammar.token.TokenType.OR;
+import static com.jlox.lox.grammar.token.TokenType.PLUS;
+import static com.jlox.lox.grammar.token.TokenType.PRINT;
+import static com.jlox.lox.grammar.token.TokenType.RETURN;
+import static com.jlox.lox.grammar.token.TokenType.RIGHT_BRACE;
+import static com.jlox.lox.grammar.token.TokenType.RIGHT_PAREN;
+import static com.jlox.lox.grammar.token.TokenType.SEMICOLON;
+import static com.jlox.lox.grammar.token.TokenType.SLASH;
+import static com.jlox.lox.grammar.token.TokenType.STAR;
+import static com.jlox.lox.grammar.token.TokenType.STRING;
+import static com.jlox.lox.grammar.token.TokenType.THIS;
+import static com.jlox.lox.grammar.token.TokenType.TRUE;
+import static com.jlox.lox.grammar.token.TokenType.VAR;
+import static com.jlox.lox.grammar.token.TokenType.WHILE;
 
 public class Parser {
 
@@ -66,13 +105,20 @@ public class Parser {
 
   private Stmt classDeclaration() {
     Token name = consume(IDENTIFIER, "Expect class name.");
+
+    Expr.Variable superclass = null;
+    if (match(LESS)) {
+      consume(IDENTIFIER, "Expect superclass name.");
+      superclass = new Expr.Variable(previous());
+    }
+
     consume(LEFT_BRACE, "Expect '{' before class body.");
 
     List<Stmt.Function> methods = new ArrayList<>();
     while (!check(RIGHT_BRACE) && !isAtEnd()) methods.add(function("method"));
 
     consume(RIGHT_BRACE, "Expect '}' after class body.");
-    return new Stmt.Class(name, methods);
+    return new Stmt.Class(name, superclass, methods);
   }
 
   private Stmt.Function function(String kind) {
@@ -153,7 +199,7 @@ public class Parser {
     Expr condition = expression();
     consume(RIGHT_PAREN, "Expect ')' after 'if' condition.");
 
-    Stmt thenBranch =statement();
+    Stmt thenBranch = statement();
     Stmt elseBranch = null;
     if (match(ELSE)) { //Will be bound to the nearest 'if'
       elseBranch = statement();
@@ -161,6 +207,7 @@ public class Parser {
 
     return new Stmt.If(condition, thenBranch, elseBranch);
   }
+
   private Stmt whileStatement() {
     consume(LEFT_PAREN, "Expect '(' after 'if'.");
     Expr condition = expression();
@@ -246,7 +293,6 @@ public class Parser {
 
   /**
    * The receiver (lvalue) of an assignment can be any expression (unbounded number of tokens).
-   *
    */
   private Expr assignment() {
     Expr expr = or();
@@ -365,8 +411,7 @@ public class Parser {
       } else if (match(DOT)) {
         Token name = consume(IDENTIFIER, "Expect property name after '.'.");
         expr = new Expr.Get(expr, name);
-      }
-      else break;
+      } else break;
     }
 
     return expr;

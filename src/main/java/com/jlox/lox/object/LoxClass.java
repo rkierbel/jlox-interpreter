@@ -8,11 +8,14 @@ import java.util.Map;
 public class LoxClass implements LoxCallable {
 
   final String name;
+  final LoxClass superclass;
   private final Map<String, LoxFunction> methods;
 
   public LoxClass(String name,
+                  LoxClass superclass,
                   Map<String, LoxFunction> methods) {
     this.name = name;
+    this.superclass = superclass;
     this.methods = methods;
   }
 

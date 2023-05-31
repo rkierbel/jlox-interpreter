@@ -39,6 +39,7 @@ public abstract class Expr {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitThisExpr(this);
     }
+
     public final Token keyword;
   }
 
@@ -52,6 +53,7 @@ public abstract class Expr {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitGetExpr(this);
     }
+
     public final Expr object;
     public final Token name;
   }
@@ -67,6 +69,7 @@ public abstract class Expr {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitSetExpr(this);
     }
+
     public final Expr object;
     public final Token name;
     public final Expr value;
@@ -172,6 +175,7 @@ public abstract class Expr {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitLogicalExpr(this);
     }
+
     public final Expr left;
     public final Token operator;
     public final Expr right;
@@ -188,11 +192,11 @@ public abstract class Expr {
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitCallExpr(this);
     }
+
     public final Expr callee;
     public final Token paren;
     public final List<Expr> arguments;
   }
-
 
 
   public abstract <R> R accept(Visitor<R> visitor);
