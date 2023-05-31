@@ -84,4 +84,9 @@ class LoxTest {
   void testCallbackThis_RunFromFile() throws IOException {
     Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\callbackThis.txt");
   }
+
+  @Test
+  void testBasicMethodInheritance_RunFromFile() throws IOException {
+    Lox.main("C:\\Users\\rkierbel\\IdeaProjects\\jlox\\src\\main\\resources\\basicMethodInheritance.txt");
+  }
 }
