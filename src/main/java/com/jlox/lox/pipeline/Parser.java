@@ -47,6 +47,7 @@ import static com.jlox.lox.grammar.token.TokenType.SEMICOLON;
 import static com.jlox.lox.grammar.token.TokenType.SLASH;
 import static com.jlox.lox.grammar.token.TokenType.STAR;
 import static com.jlox.lox.grammar.token.TokenType.STRING;
+import static com.jlox.lox.grammar.token.TokenType.SUPER;
 import static com.jlox.lox.grammar.token.TokenType.THIS;
 import static com.jlox.lox.grammar.token.TokenType.TRUE;
 import static com.jlox.lox.grammar.token.TokenType.VAR;
@@ -440,6 +441,13 @@ public class Parser {
     if (match(FALSE)) return new Expr.Literal(false);
     if (match(TRUE)) return new Expr.Literal(true);
     if (match(NIL)) return new Expr.Literal(null);
+    if (match(SUPER)) {
+      Token keyword = previous();
+      consume(DOT, "Expect '.' after 'super'.");
+      Token method = consume(IDENTIFIER,
+              "Expect superclass method name.");
+      return new Expr.Super(keyword, method);
+    }
     if (match(THIS)) return new Expr.This(previous());
     if (match(IDENTIFIER)) return new Expr.Variable(previous()); //Parsing variable expression
 
