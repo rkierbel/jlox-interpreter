@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Environment {
 
-  final Environment enclosing;
+  public final Environment enclosing;
 
   /**
    * Most tokens refer to a unit of code at a specific place in the source text.

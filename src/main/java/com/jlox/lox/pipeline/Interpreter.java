@@ -105,6 +105,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     environment.define(stmt.name.lexeme(), null); //Declare class name in current environment
 
+    if (stmt.superclass != null) {
+      environment = new Environment(environment);
+      environment.define("super", superclass);
+    }
+
     Map<String, LoxFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
       LoxFunction function = new LoxFunction(
@@ -114,6 +119,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     //Turn class syntax node into its runtime representation
     LoxClass clazz = new LoxClass(
             stmt.name.lexeme(), (LoxClass) superclass, methods);
+    if (superclass != null) {
+      environment = environment.enclosing;
+    }
     environment.assign(stmt.name, clazz); //Store the runtime object in the variable previously created
     return null;
   }
@@ -121,6 +129,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Object visitThisExpr(Expr.This expr) {
     return lookUpVariable(expr.keyword, expr);
+  }
+
+
+  @Override
+  public Object visitSuperExpr(Expr.Super expr) {
+    int hops = locals.get(expr);
+    LoxClass superclass = (LoxClass) environment.getFromEnvt(hops, "super");
+    /* the env in which 'this' is bound is always inside the env where we store 'super'
+    => offsetting the scope by one looks up 'this' in super's inner env
+     */
+    LoxInstance obj = (LoxInstance) environment.getFromEnvt(hops - 1, "this");
+    LoxFunction method = superclass.findMethod(expr.method.lexeme());
+    if (method == null) {
+      throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme() + "'.");
+    }
+    return method.bind(obj);
   }
 
   @Override
